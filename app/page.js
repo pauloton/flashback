@@ -104,10 +104,10 @@ function StarIcons({ count, size = 12 }) {
 function LoadingScreen() {
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "100dvh" }}>
-      <div style={{
+      <div className="gradient-text" style={{
         fontSize: "2rem", fontWeight: 800, fontFamily: "'Space Grotesk', sans-serif",
         background: "linear-gradient(135deg, #F59E0B, #EF4444, #F59E0B)", backgroundSize: "200% 200%",
-        WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", color: "transparent", animation: "shimmer 2s ease infinite",
+        animation: "shimmer 2s ease infinite",
       }}>FLASH<span style={{ fontWeight: 300 }}>BACK</span></div>
       <div style={{ marginTop: "1rem", color: "#9CA3AF", fontSize: "0.8rem", fontFamily: "'JetBrains Mono', monospace", animation: "pulse 1.5s ease infinite" }}>Loading today&apos;s chain...</div>
     </div>
@@ -117,7 +117,7 @@ function LoadingScreen() {
 function ErrorScreen({ message }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "100dvh", padding: "2rem", textAlign: "center" }}>
-      <div style={{ fontSize: "2rem", fontWeight: 800, fontFamily: "'Space Grotesk', sans-serif", background: "linear-gradient(135deg, #F59E0B, #EF4444)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", color: "transparent" }}>
+      <div className="gradient-text" style={{ fontSize: "2rem", fontWeight: 800, fontFamily: "'Space Grotesk', sans-serif", background: "linear-gradient(135deg, #F59E0B, #EF4444)" }}>
         FLASH<span style={{ fontWeight: 300 }}>BACK</span>
       </div>
       <div style={{ marginTop: "1.5rem", color: "#6B7280", fontSize: "0.9rem", fontFamily: "'DM Sans', sans-serif" }}>{message || "No puzzle available today"}</div>
@@ -163,12 +163,12 @@ function AnimatedLogo() {
         const currentDisplayIndex = positions.indexOf(correctIndex);
         const isBold = correctIndex < 5;
         return (
-          <span key={correctIndex} style={{
+          <span key={correctIndex} className="gradient-text" style={{
             position: "absolute", left: `calc(${letterWidth} * ${currentDisplayIndex})`, top: 0,
             width: letterWidth, textAlign: "center", fontSize, fontWeight: isBold ? 800 : 300,
             fontFamily: "'Space Grotesk', sans-serif",
             background: glowing ? "linear-gradient(135deg, #F59E0B, #EF4444, #F59E0B)" : solved ? "#D97706" : "#9CA3AF",
-            backgroundSize: "200% 200%", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", color: "transparent",
+            backgroundSize: "200% 200%",
             animation: glowing ? "shimmer 3s ease infinite" : "none",
             transition: "left 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.4s ease",
             lineHeight: 1.1, userSelect: "none",
@@ -366,15 +366,19 @@ function PlayingScreen({ events, lockedCorrect, wrongCards, onReorder, onLockIn,
 // ============================================================
 // SCREEN: RESULTS
 // ============================================================
-function CompleteScreen({ time, attempts, puzzle, onViewDashboard }) {
+function CompleteScreen({ time, attempts, puzzle, onViewDashboard, onViewChain }) {
   const [show, setShow] = useState(false);
   useEffect(() => { setTimeout(() => setShow(true), 300); }, []);
   const stars = getStars(attempts);
   const { display } = formatTime(time);
+  const cleanTrivia = puzzle.trivia ? puzzle.trivia.replace(/—/g, "-").replace(/–/g, "-") : "";
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "100dvh", padding: "2rem", textAlign: "center",
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "100dvh", padding: "2rem", textAlign: "center", position: "relative",
       opacity: show ? 1 : 0, transform: show ? "translateY(0)" : "translateY(30px)", transition: "all 0.8s cubic-bezier(0.16, 1, 0.3, 1)" }}>
+      <button onClick={onViewChain} style={{ position: "absolute", top: "1.5rem", left: "1.5rem", background: "none", border: "none", cursor: "pointer", padding: "0.5rem", color: "#9CA3AF", display: "flex", alignItems: "center" }}>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="8" cy="8" r="5"/><circle cx="16" cy="16" r="5"/></svg>
+      </button>
       <div style={{ fontSize: "0.75rem", letterSpacing: "0.3em", textTransform: "uppercase", color: "#9CA3AF", marginBottom: "2rem", fontFamily: "'JetBrains Mono', monospace" }}>Daily Chain Completed</div>
       <StarDisplay stars={stars} size={44} celebrate={true} />
       <div style={{ fontSize: "3.2rem", fontWeight: 800, color: "#1F2937", fontFamily: "'JetBrains Mono', monospace", marginTop: "1.5rem", marginBottom: "0.25rem" }}>{display}</div>
@@ -392,22 +396,22 @@ function CompleteScreen({ time, attempts, puzzle, onViewDashboard }) {
         </div>
       </div>
 
-      {puzzle.trivia && (
+      {cleanTrivia && (
         <div style={{ background: "#FFFBEB", border: "1px solid #FDE68A", borderRadius: "12px", padding: "1rem 1.25rem", marginBottom: "2rem", maxWidth: "340px", textAlign: "left" }}>
           <div style={{ fontSize: "0.65rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "#D97706", fontFamily: "'JetBrains Mono', monospace", marginBottom: "0.4rem" }}>Did you know?</div>
-          <div style={{ fontSize: "0.9rem", color: "#92400E", fontFamily: "'DM Sans', sans-serif", lineHeight: 1.5, fontStyle: "italic" }}>{puzzle.trivia}</div>
+          <div style={{ fontSize: "0.9rem", color: "#92400E", fontFamily: "'DM Sans', sans-serif", lineHeight: 1.5, fontStyle: "italic" }}>{cleanTrivia}</div>
         </div>
       )}
 
       <button onClick={onViewDashboard} style={{
         background: "linear-gradient(135deg, #F59E0B, #D97706)", color: "#fff", border: "none",
         borderRadius: "16px", padding: "1rem 2.5rem", fontSize: "1rem", fontWeight: 700, cursor: "pointer",
-        fontFamily: "'Space Grotesk', sans-serif", letterSpacing: "0.05em", boxShadow: "0 4px 24px rgba(245, 158, 11, 0.3)", transition: "all 0.2s ease", marginBottom: "1rem",
+        fontFamily: "'Space Grotesk', sans-serif", letterSpacing: "0.05em", boxShadow: "0 4px 24px rgba(245, 158, 11, 0.3)", transition: "all 0.2s ease", marginBottom: "1.5rem",
       }}
         onMouseEnter={e => { e.target.style.transform = "scale(1.05)"; }}
         onMouseLeave={e => { e.target.style.transform = "scale(1)"; }}
-      >Share your Score</button>
-      <div style={{ fontSize: "0.75rem", color: "#9CA3AF", fontFamily: "'DM Sans', sans-serif" }}>Next chain drops at midnight</div>
+      >See Leaderboard</button>
+      <ShareIcons stars={stars} time={time} date={puzzle.date} />
     </div>
   );
 }
@@ -660,7 +664,7 @@ export default function FlashBackApp() {
   };
 
   const handleViewDashboard = () => setScreen(SCREENS.DASHBOARD);
-  const handleBackToResults = () => setScreen(SCREENS.COMPLETE);
+  const handleViewChain = () => setScreen(SCREENS.PLAYING);
   const { display: timeDisplay } = formatTime(timer.time);
   const stars = getStars(attempts);
 
@@ -676,8 +680,8 @@ export default function FlashBackApp() {
         <PlayingScreen events={events} lockedCorrect={lockedCorrect} wrongCards={wrongCards}
           onReorder={handleReorder} onLockIn={handleLockIn} timeDisplay={timeDisplay} />
       )}
-      {screen === SCREENS.COMPLETE && <CompleteScreen time={timer.time} attempts={attempts} puzzle={puzzle} onViewDashboard={handleViewDashboard} />}
-      {screen === SCREENS.DASHBOARD && <DashboardScreen playerTime={timer.time} playerStars={stars} puzzle={puzzle} onBack={handleBackToResults} />}
+      {screen === SCREENS.COMPLETE && <CompleteScreen time={timer.time} attempts={attempts} puzzle={puzzle} onViewDashboard={handleViewDashboard} onViewChain={handleViewChain} />}
+      {screen === SCREENS.DASHBOARD && <DashboardScreen playerTime={timer.time} playerStars={stars} puzzle={puzzle} onBack={handleViewChain} />}
     </div>
   );
 }
@@ -690,6 +694,8 @@ const globalStyles = `
   body { background: #FFFFFF; margin: 0; overflow: hidden; }
   html { overflow: hidden; }
   ::-webkit-scrollbar { display: none; }
+
+  .gradient-text { -webkit-background-clip: text !important; -webkit-text-fill-color: transparent !important; background-clip: text !important; color: transparent !important; }
 
   @keyframes shimmer { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
   @keyframes shake { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-6px); } 40% { transform: translateX(6px); } 60% { transform: translateX(-4px); } 80% { transform: translateX(4px); } }
