@@ -243,8 +243,11 @@ function RevealScreen({ events, onRevealComplete }) {
 function DraggableList({ events, lockedCorrect, wrongCards, onReorder }) {
   const [dragIndex, setDragIndex] = useState(null);
   const [overIndex, setOverIndex] = useState(null);
+  const overIndexRef = useRef(null);
   const listRef = useRef(null);
   const touchData = useRef({ active: false, index: null, startY: 0, clone: null, itemHeight: 0 });
+  const eventsRef = useRef(events);
+  eventsRef.current = events;
 
   const handleDragStart = (e, index) => { if (lockedCorrect[events[index]?.id]) return; setDragIndex(index); e.dataTransfer.effectAllowed = "move"; };
   const handleDragOver = (e, index) => { e.preventDefault(); if (!lockedCorrect[events[index]?.id]) setOverIndex(index); };
@@ -258,13 +261,14 @@ function DraggableList({ events, lockedCorrect, wrongCards, onReorder }) {
   const handleDragEnd = () => { setDragIndex(null); setOverIndex(null); };
 
   const handleTouchStart = useCallback((e, index) => {
-    if (lockedCorrect[events[index]?.id]) return;
+    if (lockedCorrect[eventsRef.current[index]?.id]) return;
     const touch = e.touches[0]; const target = e.currentTarget;
     const rect = target.getBoundingClientRect();
     const clone = target.cloneNode(true);
     Object.assign(clone.style, { position: "fixed", left: rect.left + "px", top: rect.top + "px", width: rect.width + "px", zIndex: 9999, opacity: "0.9", transform: "scale(1.04)", boxShadow: "0 8px 32px rgba(0,0,0,0.12)", pointerEvents: "none", transition: "none" });
     document.body.appendChild(clone);
     touchData.current = { active: true, index, startY: touch.clientY, clone, itemHeight: rect.height + 8, startTop: rect.top };
+    overIndexRef.current = null;
     target.style.opacity = "0.2";
 
     const onTouchMove = (ev) => {
@@ -273,24 +277,30 @@ function DraggableList({ events, lockedCorrect, wrongCards, onReorder }) {
       touchData.current.clone.style.top = (touchData.current.startTop + dy) + "px";
       const listEl = listRef.current; if (!listEl) return;
       const items = listEl.children;
+      let foundOver = null;
       for (let i = 0; i < items.length; i++) {
-        const r = items[i].getBoundingClientRect(); if (t.clientY >= r.top && t.clientY <= r.bottom && i !== touchData.current.index && !lockedCorrect[events[i]?.id]) { setOverIndex(i); break; }
+        const r = items[i].getBoundingClientRect();
+        if (t.clientY >= r.top && t.clientY <= r.bottom && i !== touchData.current.index && !lockedCorrect[eventsRef.current[i]?.id]) { foundOver = i; break; }
       }
+      overIndexRef.current = foundOver;
+      setOverIndex(foundOver);
     };
     const onTouchEnd = () => {
       document.removeEventListener("touchmove", onTouchMove); document.removeEventListener("touchend", onTouchEnd);
       if (touchData.current.clone?.parentNode) touchData.current.clone.parentNode.removeChild(touchData.current.clone);
-      const from = touchData.current.index; const to = overIndex;
-      if (from !== null && to !== null && from !== to && !lockedCorrect[events[to]?.id]) {
-        const n = [...events]; const [m] = n.splice(from, 1); n.splice(to, 0, m); onReorder(n);
+      const from = touchData.current.index; const to = overIndexRef.current;
+      const currentEvents = eventsRef.current;
+      if (from !== null && to !== null && from !== to && !lockedCorrect[currentEvents[to]?.id]) {
+        const n = [...currentEvents]; const [m] = n.splice(from, 1); n.splice(to, 0, m); onReorder(n);
       }
       if (listRef.current?.children[from]) listRef.current.children[from].style.opacity = "1";
       touchData.current = { active: false, index: null, startY: 0, clone: null, itemHeight: 0 };
+      overIndexRef.current = null;
       setDragIndex(null); setOverIndex(null);
     };
     document.addEventListener("touchmove", onTouchMove, { passive: false });
     document.addEventListener("touchend", onTouchEnd);
-  }, [events, lockedCorrect, onReorder, overIndex]);
+  }, [lockedCorrect, onReorder]);
 
   return (
     <div ref={listRef} style={{ display: "flex", flexDirection: "column", gap: "clamp(0.25rem, 1vh, 0.6rem)", flex: 1, minHeight: 0 }}>
