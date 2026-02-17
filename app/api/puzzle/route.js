@@ -2,9 +2,12 @@ import { NextResponse } from "next/server";
 import { getTodaysPuzzle } from "@/lib/db";
 
 // GET /api/puzzle → returns today's puzzle (without years!)
-export async function GET() {
+export async function GET(request) {
   try {
-    const puzzle = await getTodaysPuzzle();
+    // Use client's local date if provided, otherwise server date
+    const { searchParams } = new URL(request.url);
+    const clientDate = searchParams.get("date");
+    const puzzle = await getTodaysPuzzle(clientDate);
 
     if (!puzzle) {
       return NextResponse.json(
