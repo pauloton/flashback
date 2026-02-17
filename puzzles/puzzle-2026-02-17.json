@@ -1,0 +1,13 @@
+{
+  "date": "2026-02-17",
+  "trivia": "Cleopatra lived closer in time to the Moon landing than to the construction of the Great Pyramid of Giza.",
+  "events": [
+    { "id": 1, "title": "The Great Pyramid of Giza is completed", "year": -2560, "hint": "Giza, Egypt" },
+    { "id": 2, "title": "The Roman Colosseum opens", "year": 80, "hint": "Rome, Italy" },
+    { "id": 3, "title": "Genghis Khan unites the Mongol tribes", "year": 1206, "hint": "Mongolia" },
+    { "id": 4, "title": "The Black Death reaches Europe", "year": 1347, "hint": "Sicily, Italy" },
+    { "id": 5, "title": "Shakespeare writes Hamlet", "year": 1601, "hint": "London, England" },
+    { "id": 6, "title": "The first powered airplane flight", "year": 1903, "hint": "Kitty Hawk, USA" },
+    { "id": 7, "title": "The World Wide Web is invented", "year": 1989, "hint": "Geneva, Switzerland" }
+  ]
+}

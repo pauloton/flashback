@@ -1,0 +1,13 @@
+{
+  "date": "2026-02-16",
+  "trivia": "The Great Wall of China took over 2,000 years to build across multiple dynasties — and it's not actually visible from space with the naked eye.",
+  "events": [
+    { "id": 1, "title": "Construction of the Great Wall begins", "year": -700, "hint": "Ancient China" },
+    { "id": 2, "title": "Julius Caesar is assassinated", "year": -44, "hint": "Rome, Italy" },
+    { "id": 3, "title": "The Viking Age begins", "year": 793, "hint": "Lindisfarne, England" },
+    { "id": 4, "title": "Magna Carta is signed", "year": 1215, "hint": "Runnymede, England" },
+    { "id": 5, "title": "Leonardo da Vinci paints the Mona Lisa", "year": 1503, "hint": "Florence, Italy" },
+    { "id": 6, "title": "The first telephone call is made", "year": 1876, "hint": "Boston, USA" },
+    { "id": 7, "title": "The Berlin Wall falls", "year": 1989, "hint": "Berlin, Germany" }
+  ]
+}
