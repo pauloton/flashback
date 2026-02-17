@@ -1,0 +1,53 @@
+{
+  "date": "2026-02-15",
+  "theme": "mixed (broad variety across all of history)",
+  "difficulty": "medium",
+  "trivia": "Cleopatra lived closer in time to the first Pizza Hut opening than to the construction of the Great Pyramid.",
+  "events": [
+    {
+      "id": 1,
+      "title": "Construction of the Great Pyramid of Giza",
+      "year": -2560,
+      "hint": "Giza, Egypt"
+    },
+    {
+      "id": 2,
+      "title": "Fall of the Western Roman Empire",
+      "year": 476,
+      "hint": "Ravenna, Italy"
+    },
+    {
+      "id": 3,
+      "title": "Magna Carta is signed",
+      "year": 1215,
+      "hint": "Runnymede, England"
+    },
+    {
+      "id": 4,
+      "title": "Gutenberg prints the first Bible",
+      "year": 1455,
+      "hint": "Mainz, Germany"
+    },
+    {
+      "id": 5,
+      "title": "The Great Fire of London",
+      "year": 1666,
+      "hint": "London, England"
+    },
+    {
+      "id": 6,
+      "title": "Darwin publishes On the Origin of Species",
+      "year": 1859,
+      "hint": "London, England"
+    },
+    {
+      "id": 7,
+      "title": "First email ever sent",
+      "year": 1971,
+      "hint": "Cambridge, Massachusetts"
+    }
+  ],
+  "generated_at": "2026-02-14T23:39:19.434Z",
+  "verified": true,
+  "status": "pending_review"
+}
