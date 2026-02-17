@@ -215,7 +215,24 @@ function RevealScreen({ events, onRevealComplete }) {
 // ============================================================
 // SCREEN: PLAYING
 // ============================================================
-function DraggableList({ events, lockedCorrect, wrongCards, onReorder }) {
+function reorderAroundLocks(events, fromIndex, toIndex, lockedCorrect) {
+  const dragged = events[fromIndex];
+  const result = new Array(events.length).fill(null);
+  // Pin locked cards in their positions
+  events.forEach((ev, i) => { if (lockedCorrect[ev.id]) result[i] = ev; });
+  // Collect unlocked cards in order, minus the dragged one
+  const unlocked = events.filter((ev, i) => !lockedCorrect[ev.id] && i !== fromIndex);
+  // Figure out insert position among unlocked slots
+  let insertAt = 0;
+  for (let i = 0; i < toIndex; i++) { if (!result[i]) insertAt++; }
+  unlocked.splice(insertAt, 0, dragged);
+  // Fill unlocked slots
+  let ui = 0;
+  for (let i = 0; i < result.length; i++) { if (!result[i]) result[i] = unlocked[ui++]; }
+  return result;
+}
+
+function DraggableList({ events, lockedCorrect, wrongCards, onReorder, allCorrect }) {
   const [dragIndex, setDragIndex] = useState(null);
   const [overIndex, setOverIndex] = useState(null);
   const overIndexRef = useRef(null);
@@ -225,11 +242,11 @@ function DraggableList({ events, lockedCorrect, wrongCards, onReorder }) {
   eventsRef.current = events;
 
   const handleDragStart = (e, index) => { if (lockedCorrect[events[index]?.id]) return; setDragIndex(index); e.dataTransfer.effectAllowed = "move"; };
-  const handleDragOver = (e, index) => { e.preventDefault(); if (!lockedCorrect[events[index]?.id]) setOverIndex(index); };
+  const handleDragOver = (e, index) => { e.preventDefault(); setOverIndex(index); };
   const handleDrop = (e, targetIndex) => {
     e.preventDefault();
-    if (dragIndex !== null && dragIndex !== targetIndex && !lockedCorrect[events[targetIndex]?.id]) {
-      const n = [...events]; const [m] = n.splice(dragIndex, 1); n.splice(targetIndex, 0, m); onReorder(n);
+    if (dragIndex !== null && dragIndex !== targetIndex && !lockedCorrect[events[dragIndex]?.id]) {
+      onReorder(reorderAroundLocks(events, dragIndex, targetIndex, lockedCorrect));
     }
     setDragIndex(null); setOverIndex(null);
   };
@@ -255,7 +272,7 @@ function DraggableList({ events, lockedCorrect, wrongCards, onReorder }) {
       let foundOver = null;
       for (let i = 0; i < items.length; i++) {
         const r = items[i].getBoundingClientRect();
-        if (t.clientY >= r.top && t.clientY <= r.bottom && i !== touchData.current.index && !lockedCorrect[eventsRef.current[i]?.id]) { foundOver = i; break; }
+        if (t.clientY >= r.top && t.clientY <= r.bottom && i !== touchData.current.index) { foundOver = i; break; }
       }
       overIndexRef.current = foundOver;
       setOverIndex(foundOver);
@@ -265,8 +282,8 @@ function DraggableList({ events, lockedCorrect, wrongCards, onReorder }) {
       if (touchData.current.clone?.parentNode) touchData.current.clone.parentNode.removeChild(touchData.current.clone);
       const from = touchData.current.index; const to = overIndexRef.current;
       const currentEvents = eventsRef.current;
-      if (from !== null && to !== null && from !== to && !lockedCorrect[currentEvents[to]?.id]) {
-        const n = [...currentEvents]; const [m] = n.splice(from, 1); n.splice(to, 0, m); onReorder(n);
+      if (from !== null && to !== null && from !== to && !lockedCorrect[currentEvents[from]?.id]) {
+        onReorder(reorderAroundLocks(currentEvents, from, to, lockedCorrect));
       }
       if (listRef.current?.children[from]) listRef.current.children[from].style.opacity = "1";
       touchData.current = { active: false, index: null, startY: 0, clone: null, itemHeight: 0 };
@@ -290,21 +307,21 @@ function DraggableList({ events, lockedCorrect, wrongCards, onReorder }) {
             style={{
               background: isLocked ? "rgba(0,0,0,0.03)" : isWrong ? "rgba(0,0,0,0.02)" : isOver ? "#F0F0F0" : "#F5F5F5",
               border: isLocked ? "1px solid #CCC" : isWrong ? "1px solid #999" : isOver ? "1px solid #999" : "1px solid #EEE",
-              borderRadius: "12px", padding: "clamp(0.4rem, 1.2vh, 1rem) clamp(0.7rem, 2vw, 1.25rem)",
+              borderRadius: "12px", padding: "clamp(0.4rem, 1.2vh, 1rem) clamp(1rem, 3vw, 1.5rem)",
               cursor: isLocked ? "default" : "grab", flex: 1, minHeight: 0,
               opacity: isDragging ? 0.3 : 1, transform: isOver && !isLocked ? "scale(1.02)" : "scale(1)",
               transition: isDragging ? "none" : "all 0.25s cubic-bezier(0.16, 1, 0.3, 1)",
-              display: "flex", alignItems: "center", gap: "0.75rem", userSelect: "none", touchAction: "none",
-              animation: isWrong ? "shake 0.4s ease" : "none", overflow: "hidden",
+              display: "flex", alignItems: "center", justifyContent: "center", gap: "0.75rem", userSelect: "none", touchAction: "none",
+              animation: allCorrect ? `celebrate 0.5s ease ${index * 0.07}s both` : isWrong ? "shake 0.4s ease" : "none", overflow: "hidden",
             }}>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: "clamp(0.78rem, 2.2vw, 0.95rem)", fontWeight: 600, color: "#000", fontFamily: "'DM Sans', sans-serif", lineHeight: 1.25, overflow: "hidden", textOverflow: "ellipsis", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}>{event.title}</div>
-              <div style={{ fontSize: "clamp(0.6rem, 1.8vw, 0.75rem)", color: isLocked ? "#999" : "#CCC", marginTop: "0.1rem", fontFamily: "'JetBrains Mono', monospace", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+            <div style={{ flex: 1, minWidth: 0, textAlign: "center" }}>
+              <div style={{ fontSize: "clamp(0.88rem, 2.5vw, 1.05rem)", fontWeight: 600, color: "#000", fontFamily: "'DM Sans', sans-serif", lineHeight: 1.3, overflow: "hidden", textOverflow: "ellipsis", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}>{event.title}</div>
+              <div style={{ fontSize: "clamp(0.65rem, 1.9vw, 0.8rem)", color: isLocked ? "#999" : "#CCC", marginTop: "0.15rem", fontFamily: "'JetBrains Mono', monospace", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                 {event.hint}{isLocked && <span style={{ color: "#000", marginLeft: "0.5rem", fontWeight: 700 }}>{event.year}</span>}
               </div>
             </div>
-            <div style={{ flexShrink: 0, fontSize: "1rem" }}>
-              {isLocked ? <span style={{ color: "#000" }}>✓</span> : <span style={{ color: "#DDD" }}>⠿</span>}
+            <div style={{ flexShrink: 0 }}>
+              {isLocked ? <svg width="14" height="14" viewBox="0 0 24 24" fill="#000" stroke="none"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4" fill="none" stroke="#000" strokeWidth="2.5" strokeLinecap="round"/></svg> : <span style={{ color: "#DDD", fontSize: "1rem" }}>⠿</span>}
             </div>
           </div>
         );
@@ -323,13 +340,13 @@ function PlayingScreen({ events, lockedCorrect, wrongCards, onReorder, onLockIn,
       <div style={{ height: "3px", background: "#EEE", borderRadius: "2px", marginBottom: "0.6rem", overflow: "hidden", flexShrink: 0 }}>
         <div style={{ height: "100%", width: `${(Object.keys(lockedCorrect).length / 7) * 100}%`, background: "#000", borderRadius: "2px", transition: "width 0.5s cubic-bezier(0.16, 1, 0.3, 1)" }} />
       </div>
-      <DraggableList events={events} lockedCorrect={lockedCorrect} wrongCards={wrongCards} onReorder={onReorder} />
+      <DraggableList events={events} lockedCorrect={lockedCorrect} wrongCards={wrongCards} onReorder={onReorder} allCorrect={Object.keys(lockedCorrect).length === 7} />
       <div style={{ paddingTop: "0.6rem", paddingBottom: "env(safe-area-inset-bottom, 0.5rem)", flexShrink: 0 }}>
         <button onClick={onLockIn} style={{
           width: "100%", background: "#000", color: "#fff", border: "none", borderRadius: "14px",
           padding: "0.85rem", fontSize: "1rem", fontWeight: 700, cursor: "pointer",
           fontFamily: "'Space Grotesk', sans-serif", letterSpacing: "0.05em", transition: "all 0.2s ease",
-        }}>Lock the chain</button>
+        }}>Lock it in!</button>
       </div>
     </div>
   );
@@ -541,6 +558,7 @@ const globalStyles = `
   html { overflow: hidden; }
   ::-webkit-scrollbar { display: none; }
   @keyframes shake { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-6px); } 40% { transform: translateX(6px); } 60% { transform: translateX(-4px); } 80% { transform: translateX(4px); } }
+  @keyframes celebrate { 0% { transform: scale(1); } 25% { transform: scale(1.03) rotate(-0.5deg); } 50% { transform: scale(1.05) rotate(0.5deg); } 75% { transform: scale(1.03) rotate(-0.3deg); } 100% { transform: scale(1); } }
   @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
   @keyframes starPop { 0% { transform: scale(0); opacity: 0; } 50% { transform: scale(1.5); opacity: 1; } 75% { transform: scale(0.9); } 100% { transform: scale(1.15); opacity: 1; } }
 `;
