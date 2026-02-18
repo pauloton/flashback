@@ -199,7 +199,7 @@ function RevealScreen({ events, onRevealComplete }) {
             transition: "all 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
           }}>
             <div style={{ flex: 1, textAlign: "center" }}>
-              <div style={{ fontSize: "clamp(0.88rem, 2.5vw, 1.05rem)", fontWeight: 600, color: isLocked ? "#f9d43c" : "#000", fontFamily: "'DM Sans', sans-serif", lineHeight: 1.3 }}>{event.title}</div>
+              <div style={{ fontSize: "clamp(0.88rem, 2.5vw, 1.05rem)", fontWeight: 600, color: "#000", fontFamily: "'DM Sans', sans-serif", lineHeight: 1.3 }}>{event.title}</div>
               <div style={{ fontSize: "clamp(0.65rem, 1.9vw, 0.8rem)", color: "rgba(0,0,0,0.25)", marginTop: "0.15rem", fontFamily: "'JetBrains Mono', monospace" }}>{event.hint}</div>
             </div>
           </div>
