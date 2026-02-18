@@ -68,7 +68,7 @@ function StarDisplay({ stars, size = 28, celebrate = false }) {
         const filled = i <= visibleStars; const empty = i > stars;
         return (
           <svg key={i} width={size} height={size} viewBox="0 0 24 24"
-            fill={filled ? "#000" : "none"} stroke={empty ? "#DDD" : filled ? "#000" : "#DDD"}
+            fill={filled ? "#000" : "none"} stroke={empty ? "rgba(0,0,0,0.15)" : filled ? "#000" : "rgba(0,0,0,0.15)"}
             strokeWidth="2" strokeLinejoin="round"
             style={{
               transform: filled ? "scale(1.15)" : "scale(1)", transition: "all 0.3s ease",
@@ -89,7 +89,7 @@ function LoadingScreen() {
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "100dvh" }}>
       <div style={{ fontSize: "2rem", fontWeight: 800, fontFamily: "'Space Grotesk', sans-serif", color: "#000" }}>FLASH<span style={{ fontWeight: 300 }}>BACK</span></div>
-      <div style={{ marginTop: "1rem", color: "#CCC", fontSize: "0.8rem", fontFamily: "'JetBrains Mono', monospace", animation: "pulse 1.5s ease infinite" }}>Loading today&apos;s chain...</div>
+      <div style={{ marginTop: "1rem", color: "rgba(0,0,0,0.3)", fontSize: "0.8rem", fontFamily: "'JetBrains Mono', monospace", animation: "pulse 1.5s ease infinite" }}>Loading today&apos;s chain...</div>
     </div>
   );
 }
@@ -98,8 +98,8 @@ function ErrorScreen({ message }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "100dvh", padding: "2rem", textAlign: "center" }}>
       <div style={{ fontSize: "2rem", fontWeight: 800, fontFamily: "'Space Grotesk', sans-serif", color: "#000" }}>FLASH<span style={{ fontWeight: 300 }}>BACK</span></div>
-      <div style={{ marginTop: "1.5rem", color: "#999", fontSize: "0.9rem", fontFamily: "'DM Sans', sans-serif" }}>{message || "No puzzle available today"}</div>
-      <div style={{ marginTop: "0.5rem", color: "#CCC", fontSize: "0.75rem" }}>Come back tomorrow for a fresh chain!</div>
+      <div style={{ marginTop: "1.5rem", color: "rgba(0,0,0,0.4)", fontSize: "0.9rem", fontFamily: "'DM Sans', sans-serif" }}>{message || "No puzzle available today"}</div>
+      <div style={{ marginTop: "0.5rem", color: "rgba(0,0,0,0.25)", fontSize: "0.75rem" }}>Come back tomorrow for a fresh chain!</div>
     </div>
   );
 }
@@ -143,7 +143,7 @@ function AnimatedLogo() {
           <span key={correctIndex} style={{
             position: "absolute", left: `calc(${letterWidth} * ${currentDisplayIndex})`, top: 0,
             width: letterWidth, textAlign: "center", fontSize, fontWeight: isBold ? 800 : 300,
-            fontFamily: "'Space Grotesk', sans-serif", color: solved ? "#000" : "#CCC",
+            fontFamily: "'Space Grotesk', sans-serif", color: solved ? "#000" : "rgba(0,0,0,0.2)",
             transition: "left 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.4s ease",
             lineHeight: 1.1, userSelect: "none",
           }}>{letter}</span>
@@ -160,12 +160,12 @@ function IntroScreen({ onStart, puzzle }) {
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "100dvh", padding: "2rem", textAlign: "center",
       opacity: show ? 1 : 0, transform: show ? "translateY(0)" : "translateY(20px)", transition: "all 0.8s cubic-bezier(0.16, 1, 0.3, 1)" }}>
       <AnimatedLogo />
-      <p style={{ fontSize: "1rem", color: "#999", lineHeight: 1.5, margin: "0 0 2.5rem 0", fontFamily: "'DM Sans', sans-serif", fontStyle: "italic" }}>Moments That Changed Everything</p>
-      <div style={{ fontSize: "0.85rem", color: "#CCC", fontFamily: "'JetBrains Mono', monospace", marginBottom: "2.5rem" }}>
+      <p style={{ fontSize: "1rem", color: "rgba(0,0,0,0.35)", lineHeight: 1.5, margin: "0 0 2.5rem 0", fontFamily: "'DM Sans', sans-serif", fontStyle: "italic" }}>Moments That Changed Everything</p>
+      <div style={{ fontSize: "0.85rem", color: "rgba(0,0,0,0.2)", fontFamily: "'JetBrains Mono', monospace", marginBottom: "2.5rem" }}>
         {new Date(puzzle.date + "T12:00:00").toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
       </div>
       <button onClick={onStart} style={{
-        background: "#000", color: "#fff", border: "none", borderRadius: "16px", padding: "1rem 3rem",
+        background: "#000", color: "#f9d43c", border: "none", borderRadius: "16px", padding: "1rem 3rem",
         fontSize: "1.1rem", fontWeight: 700, cursor: "pointer", fontFamily: "'Space Grotesk', sans-serif",
         letterSpacing: "0.05em", transition: "all 0.2s ease",
       }}
@@ -192,21 +192,21 @@ function RevealScreen({ events, onRevealComplete }) {
       <div style={{ display: "flex", flexDirection: "column", gap: "clamp(0.3rem, 1vh, 0.6rem)", flex: 1, minHeight: 0 }}>
         {events.map((event, index) => (
           <div key={event.id} style={{
-            background: "#F5F5F5", border: "1px solid #EEE", borderRadius: "12px",
+            background: "rgba(0,0,0,0.05)", border: "1px solid rgba(0,0,0,0.08)", borderRadius: "12px",
             padding: "clamp(0.5rem, 1.2vh, 1rem) clamp(1rem, 3vw, 1.5rem)",
             display: "flex", alignItems: "center", justifyContent: "center", gap: "0.75rem", flex: 1, minHeight: 0, overflow: "hidden",
             opacity: index < revealed ? 1 : 0, transform: index < revealed ? "translateX(0)" : "translateX(-20px)",
             transition: "all 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
           }}>
             <div style={{ flex: 1, textAlign: "center" }}>
-              <div style={{ fontSize: "clamp(0.88rem, 2.5vw, 1.05rem)", fontWeight: 600, color: "#000", fontFamily: "'DM Sans', sans-serif", lineHeight: 1.3 }}>{event.title}</div>
-              <div style={{ fontSize: "clamp(0.65rem, 1.9vw, 0.8rem)", color: "#BBB", marginTop: "0.15rem", fontFamily: "'JetBrains Mono', monospace" }}>{event.hint}</div>
+              <div style={{ fontSize: "clamp(0.88rem, 2.5vw, 1.05rem)", fontWeight: 600, color: isLocked ? "#f9d43c" : "#000", fontFamily: "'DM Sans', sans-serif", lineHeight: 1.3 }}>{event.title}</div>
+              <div style={{ fontSize: "clamp(0.65rem, 1.9vw, 0.8rem)", color: "rgba(0,0,0,0.25)", marginTop: "0.15rem", fontFamily: "'JetBrains Mono', monospace" }}>{event.hint}</div>
             </div>
           </div>
         ))}
       </div>
       {revealed >= events.length && (
-        <div style={{ textAlign: "center", marginTop: "1.5rem", fontSize: "0.85rem", color: "#999", fontFamily: "'JetBrains Mono', monospace", animation: "pulse 1s ease infinite" }}>Shuffling...</div>
+        <div style={{ textAlign: "center", marginTop: "1.5rem", fontSize: "0.85rem", color: "rgba(0,0,0,0.3)", fontFamily: "'JetBrains Mono', monospace", animation: "pulse 1s ease infinite" }}>Shuffling...</div>
       )}
     </div>
   );
@@ -305,8 +305,8 @@ function DraggableList({ events, lockedCorrect, wrongCards, onReorder, allCorrec
             onDrop={(e) => handleDrop(e, index)} onDragEnd={handleDragEnd}
             onTouchStart={(e) => handleTouchStart(e, index)}
             style={{
-              background: isLocked ? "rgba(0,0,0,0.03)" : isWrong ? "rgba(0,0,0,0.02)" : isOver ? "#F0F0F0" : "#F5F5F5",
-              border: isLocked ? "1px solid #CCC" : isWrong ? "1px solid #999" : isOver ? "1px solid #999" : "1px solid #EEE",
+              background: isLocked ? "#000" : isWrong ? "rgba(0,0,0,0.02)" : isOver ? "rgba(0,0,0,0.08)" : "rgba(0,0,0,0.05)",
+              border: isLocked ? "none" : isWrong ? "1px solid rgba(0,0,0,0.15)" : isOver ? "1px solid rgba(0,0,0,0.15)" : "1px solid rgba(0,0,0,0.08)",
               borderRadius: "12px", padding: "clamp(0.4rem, 1.2vh, 1rem) clamp(1rem, 3vw, 1.5rem)",
               cursor: isLocked ? "default" : "grab", flex: 1, minHeight: 0,
               opacity: isDragging ? 0.3 : 1, transform: isOver && !isLocked ? "scale(1.02)" : "scale(1)",
@@ -316,11 +316,11 @@ function DraggableList({ events, lockedCorrect, wrongCards, onReorder, allCorrec
             }}>
             <div style={{ flex: 1, minWidth: 0, textAlign: "center" }}>
               <div style={{ fontSize: "clamp(0.88rem, 2.5vw, 1.05rem)", fontWeight: 600, color: "#000", fontFamily: "'DM Sans', sans-serif", lineHeight: 1.3, overflow: "hidden", textOverflow: "ellipsis", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}>{event.title}</div>
-              <div style={{ fontSize: "clamp(0.65rem, 1.9vw, 0.8rem)", color: isLocked ? "#999" : "#CCC", marginTop: "0.15rem", fontFamily: "'JetBrains Mono', monospace", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                {event.hint}{isLocked && <span style={{ color: "#000", marginLeft: "0.5rem", fontWeight: 700 }}>{event.year}</span>}
+              <div style={{ fontSize: "clamp(0.65rem, 1.9vw, 0.8rem)", color: isLocked ? "rgba(249,212,60,0.5)" : "rgba(0,0,0,0.25)", marginTop: "0.15rem", fontFamily: "'JetBrains Mono', monospace", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                {event.hint}{isLocked && <span style={{ color: "#f9d43c", marginLeft: "0.5rem", fontWeight: 700 }}>{event.year}</span>}
               </div>
             </div>
-            {!isLocked && <div style={{ flexShrink: 0 }}><span style={{ color: "#DDD", fontSize: "1rem" }}>⠿</span></div>}
+            {!isLocked && <div style={{ flexShrink: 0 }}><span style={{ color: "rgba(0,0,0,0.15)", fontSize: "1rem" }}>⠿</span></div>}
           </div>
         );
       })}
@@ -333,15 +333,15 @@ function PlayingScreen({ events, lockedCorrect, wrongCards, onReorder, onLockIn,
     <div style={{ width: "100%", maxWidth: "440px", margin: "0 auto", padding: "0.75rem 0.75rem", height: "100dvh", display: "flex", flexDirection: "column", overflow: "hidden" }}>
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: "0.5rem", flexShrink: 0 }}>
         <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "1.4rem", fontWeight: 700, color: "#000" }}>{timeDisplay}</div>
-        <div style={{ fontSize: "0.6rem", color: "#CCC", letterSpacing: "0.2em", textTransform: "uppercase", fontFamily: "'JetBrains Mono', monospace", marginTop: "0.15rem" }}>Moments That Changed Everything</div>
+        <div style={{ fontSize: "0.6rem", color: "rgba(0,0,0,0.3)", letterSpacing: "0.2em", textTransform: "uppercase", fontFamily: "'JetBrains Mono', monospace", marginTop: "0.15rem" }}>Moments That Changed Everything</div>
       </div>
-      <div style={{ height: "3px", background: "#EEE", borderRadius: "2px", marginBottom: "0.6rem", overflow: "hidden", flexShrink: 0 }}>
+      <div style={{ height: "3px", background: "rgba(0,0,0,0.1)", borderRadius: "2px", marginBottom: "0.6rem", overflow: "hidden", flexShrink: 0 }}>
         <div style={{ height: "100%", width: `${(Object.keys(lockedCorrect).length / 7) * 100}%`, background: "#000", borderRadius: "2px", transition: "width 0.5s cubic-bezier(0.16, 1, 0.3, 1)" }} />
       </div>
       <DraggableList events={events} lockedCorrect={lockedCorrect} wrongCards={wrongCards} onReorder={onReorder} allCorrect={Object.keys(lockedCorrect).length === 7} />
       <div style={{ paddingTop: "0.6rem", paddingBottom: "env(safe-area-inset-bottom, 0.5rem)", flexShrink: 0 }}>
         <button onClick={onLockIn} style={{
-          width: "100%", background: "#000", color: "#fff", border: "none", borderRadius: "14px",
+          width: "100%", background: "#000", color: "#f9d43c", border: "none", borderRadius: "14px",
           padding: "0.85rem", fontSize: "1rem", fontWeight: 700, cursor: "pointer",
           fontFamily: "'Space Grotesk', sans-serif", letterSpacing: "0.05em", transition: "all 0.2s ease",
         }}>Lock it in!</button>
@@ -358,7 +358,7 @@ function ShareIcons({ stars, time, date }) {
   const shareText = `I finished my FlashBack Chain in ${formatTime(time).display}. Could you beat it?`;
   const encodedText = encodeURIComponent(shareText);
   const encodedUrl = encodeURIComponent(gameUrl);
-  const c = "#999";
+  const c = "rgba(0,0,0,0.35)";
   const platforms = [
     { name: "Instagram", action: () => { navigator.clipboard?.writeText(shareText + " " + gameUrl).then(() => { window.open("https://www.instagram.com/", "_blank"); }); }, icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill={c} stroke="none"/></svg> },
     { name: "WhatsApp", action: () => { window.open(`https://wa.me/?text=${encodedText}%20${encodedUrl}`, "_blank"); }, icon: <svg width="18" height="18" viewBox="0 0 24 24" fill={c}><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> },
@@ -368,9 +368,9 @@ function ShareIcons({ stars, time, date }) {
   return (
     <div style={{ display: "flex", justifyContent: "center", gap: "0.75rem" }}>
       {platforms.map(p => (
-        <button key={p.name} onClick={p.action} style={{ width: "44px", height: "44px", borderRadius: "12px", background: "#F5F5F5", border: "none", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "all 0.2s ease" }}
-          onMouseEnter={e => { e.currentTarget.style.background = "#EEE"; }}
-          onMouseLeave={e => { e.currentTarget.style.background = "#F5F5F5"; }}
+        <button key={p.name} onClick={p.action} style={{ width: "44px", height: "44px", borderRadius: "12px", background: "rgba(0,0,0,0.06)", border: "none", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "all 0.2s ease" }}
+          onMouseEnter={e => { e.currentTarget.style.background = "rgba(0,0,0,0.1)"; }}
+          onMouseLeave={e => { e.currentTarget.style.background = "rgba(0,0,0,0.06)"; }}
           title={p.name}>{p.icon}</button>
       ))}
     </div>
@@ -404,7 +404,7 @@ function CompleteScreen({ time, attempts, puzzle, onViewChain }) {
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "100dvh", padding: "1.5rem", textAlign: "center", position: "relative",
       opacity: show ? 1 : 0, transform: show ? "translateY(0)" : "translateY(30px)", transition: "all 0.8s cubic-bezier(0.16, 1, 0.3, 1)" }}>
 
-      <button onClick={onViewChain} style={{ position: "absolute", top: "1.5rem", left: "1.5rem", background: "none", border: "none", cursor: "pointer", padding: "0.5rem", color: "#CCC", display: "flex", alignItems: "center" }}>
+      <button onClick={onViewChain} style={{ position: "absolute", top: "1.5rem", left: "1.5rem", background: "none", border: "none", cursor: "pointer", padding: "0.5rem", color: "rgba(0,0,0,0.2)", display: "flex", alignItems: "center" }}>
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="8" cy="8" r="5"/><circle cx="16" cy="16" r="5"/></svg>
       </button>
 
@@ -417,46 +417,46 @@ function CompleteScreen({ time, attempts, puzzle, onViewChain }) {
         transition: "all 0.6s cubic-bezier(0.16, 1, 0.3, 1)",
       }}>Congratulations!</div>
 
-      <div style={{ background: "#F5F5F5", borderRadius: "16px", padding: "1.25rem 2rem", marginBottom: "1.5rem", width: "100%", maxWidth: "340px" }}>
-        <div style={{ fontSize: "clamp(2.4rem, 8vw, 3.2rem)", fontWeight: 800, color: "#000", fontFamily: "'JetBrains Mono', monospace", lineHeight: 1 }}>{display}</div>
+      <div style={{ background: "#000", borderRadius: "16px", padding: "1.25rem 2rem", marginBottom: "1.5rem", width: "100%", maxWidth: "340px" }}>
+        <div style={{ fontSize: "clamp(2.4rem, 8vw, 3.2rem)", fontWeight: 800, color: "#f9d43c", fontFamily: "'JetBrains Mono', monospace", lineHeight: 1 }}>{display}</div>
         <div style={{ display: "flex", justifyContent: "center", gap: "1.5rem", marginTop: "0.75rem" }}>
           <div style={{ textAlign: "center" }}>
-            <div style={{ fontSize: "1rem", fontWeight: 700, color: "#000", fontFamily: "'JetBrains Mono', monospace" }}>{attempts}</div>
-            <div style={{ fontSize: "0.6rem", color: "#999", fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: "0.1em" }}>Attempts</div>
+            <div style={{ fontSize: "1rem", fontWeight: 700, color: "#f9d43c", fontFamily: "'JetBrains Mono', monospace" }}>{attempts}</div>
+            <div style={{ fontSize: "0.6rem", color: "rgba(249,212,60,0.5)", fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: "0.1em" }}>Attempts</div>
           </div>
-          <div style={{ width: "1px", background: "#E0E0E0" }} />
+          <div style={{ width: "1px", background: "rgba(249,212,60,0.15)" }} />
           <div style={{ textAlign: "center" }}>
-            <div style={{ fontSize: "1rem", fontWeight: 700, color: "#000", fontFamily: "'JetBrains Mono', monospace" }}>{played}</div>
+            <div style={{ fontSize: "1rem", fontWeight: 700, color: "#f9d43c", fontFamily: "'JetBrains Mono', monospace" }}>{played}</div>
             <div style={{ fontSize: "0.6rem", color: "#999", fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: "0.1em" }}>Played</div>
           </div>
           <div style={{ width: "1px", background: "#E0E0E0" }} />
           <div style={{ textAlign: "center" }}>
-            <div style={{ fontSize: "1rem", fontWeight: 700, color: "#000", fontFamily: "'JetBrains Mono', monospace" }}>{streak}</div>
+            <div style={{ fontSize: "1rem", fontWeight: 700, color: "#f9d43c", fontFamily: "'JetBrains Mono', monospace" }}>{streak}</div>
             <div style={{ fontSize: "0.6rem", color: "#999", fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: "0.1em" }}>Streak</div>
           </div>
         </div>
       </div>
 
       <div style={{ width: "100%", maxWidth: "340px", marginBottom: "1.5rem" }}>
-        <div style={{ fontSize: "0.6rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "#CCC", fontFamily: "'JetBrains Mono', monospace", marginBottom: "0.6rem", textAlign: "left" }}>Today&apos;s Top 5</div>
+        <div style={{ fontSize: "0.6rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(0,0,0,0.25)", fontFamily: "'JetBrains Mono', monospace", marginBottom: "0.6rem", textAlign: "left" }}>Today&apos;s Top 5</div>
         <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
           {todayLB.length === 0 && (
-            <div style={{ padding: "0.75rem", color: "#CCC", fontSize: "0.75rem", fontFamily: "'JetBrains Mono', monospace" }}>No scores yet - you are the pioneer!</div>
+            <div style={{ padding: "0.75rem", color: "rgba(0,0,0,0.25)", fontSize: "0.75rem", fontFamily: "'JetBrains Mono', monospace" }}>No scores yet - you are the pioneer!</div>
           )}
           {todayLB.slice(0, 5).map((entry, i) => (
-            <div key={i} style={{ display: "flex", alignItems: "center", padding: "0.5rem 0.75rem", background: i === 0 ? "#F5F5F5" : "transparent", borderRadius: "8px" }}>
-              <div style={{ width: "24px", fontSize: "0.7rem", fontWeight: 700, color: i === 0 ? "#000" : "#CCC", fontFamily: "'JetBrains Mono', monospace" }}>{entry.rank}</div>
-              <div style={{ flex: 1, fontSize: "0.75rem", color: i === 0 ? "#000" : "#888", fontFamily: "'DM Sans', sans-serif", textAlign: "left" }}>{entry.name}</div>
-              <div style={{ fontSize: "0.7rem", color: i === 0 ? "#000" : "#BBB", fontFamily: "'JetBrains Mono', monospace", fontWeight: 600 }}>{formatTime(entry.time).display}</div>
+            <div key={i} style={{ display: "flex", alignItems: "center", padding: "0.5rem 0.75rem", background: i === 0 ? "rgba(0,0,0,0.06)" : "transparent", borderRadius: "8px" }}>
+              <div style={{ width: "24px", fontSize: "0.7rem", fontWeight: 700, color: i === 0 ? "#000" : "rgba(0,0,0,0.25)", fontFamily: "'JetBrains Mono', monospace" }}>{entry.rank}</div>
+              <div style={{ flex: 1, fontSize: "0.75rem", color: i === 0 ? "#000" : "rgba(0,0,0,0.4)", fontFamily: "'DM Sans', sans-serif", textAlign: "left" }}>{entry.name}</div>
+              <div style={{ fontSize: "0.7rem", color: i === 0 ? "#000" : "rgba(0,0,0,0.25)", fontFamily: "'JetBrains Mono', monospace", fontWeight: 600 }}>{formatTime(entry.time).display}</div>
             </div>
           ))}
           {playerRank > 5 && (
             <>
-              <div style={{ height: "1px", background: "#F0F0F0", margin: "0.25rem 0" }} />
-              <div style={{ display: "flex", alignItems: "center", padding: "0.5rem 0.75rem", background: "#F5F5F5", borderRadius: "8px" }}>
-                <div style={{ width: "24px", fontSize: "0.7rem", fontWeight: 700, color: "#000", fontFamily: "'JetBrains Mono', monospace" }}>{playerRank}</div>
-                <div style={{ flex: 1, fontSize: "0.75rem", color: "#000", fontFamily: "'DM Sans', sans-serif", fontWeight: 600, textAlign: "left" }}>You</div>
-                <div style={{ fontSize: "0.7rem", color: "#000", fontFamily: "'JetBrains Mono', monospace", fontWeight: 600 }}>{display}</div>
+              <div style={{ height: "1px", background: "rgba(0,0,0,0.08)", margin: "0.25rem 0" }} />
+              <div style={{ display: "flex", alignItems: "center", padding: "0.5rem 0.75rem", background: "#000", borderRadius: "8px" }}>
+                <div style={{ width: "24px", fontSize: "0.7rem", fontWeight: 700, color: "#f9d43c", fontFamily: "'JetBrains Mono', monospace" }}>{playerRank}</div>
+                <div style={{ flex: 1, fontSize: "0.75rem", color: "#f9d43c", fontFamily: "'DM Sans', sans-serif", fontWeight: 600, textAlign: "left" }}>You</div>
+                <div style={{ fontSize: "0.7rem", color: "#f9d43c", fontFamily: "'JetBrains Mono', monospace", fontWeight: 600 }}>{display}</div>
               </div>
             </>
           )}
@@ -464,7 +464,7 @@ function CompleteScreen({ time, attempts, puzzle, onViewChain }) {
       </div>
 
       <ShareIcons stars={stars} time={time} date={puzzle.date} />
-      <div style={{ fontSize: "0.65rem", color: "#DDD", fontFamily: "'JetBrains Mono', monospace", marginTop: "1.25rem" }}>Next chain drops at midnight</div>
+      <div style={{ fontSize: "0.65rem", color: "rgba(0,0,0,0.2)", fontFamily: "'JetBrains Mono', monospace", marginTop: "1.25rem" }}>Next chain drops at midnight</div>
     </div>
   );
 }
@@ -535,7 +535,7 @@ export default function FlashBackApp() {
   const handleViewChain = () => setScreen(SCREENS.PLAYING);
 
   return (
-    <div style={{ background: "#FFF", minHeight: "100dvh", color: "#000", fontFamily: "'DM Sans', sans-serif", overflow: "hidden" }}>
+    <div style={{ background: "#f9d43c", minHeight: "100dvh", color: "#000", fontFamily: "'DM Sans', sans-serif", overflow: "hidden" }}>
       <style>{globalStyles}</style>
       {screen === SCREENS.LOADING && <LoadingScreen />}
       {screen === SCREENS.ERROR && <ErrorScreen />}
@@ -552,7 +552,7 @@ export default function FlashBackApp() {
 
 const globalStyles = `
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-text-size-adjust: 100%; }
-  body { background: #FFF; margin: 0; overflow: hidden; }
+  body { background: #f9d43c; margin: 0; overflow: hidden; }
   html { overflow: hidden; }
   ::-webkit-scrollbar { display: none; }
   @keyframes shake { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-6px); } 40% { transform: translateX(6px); } 60% { transform: translateX(-4px); } 80% { transform: translateX(4px); } }
