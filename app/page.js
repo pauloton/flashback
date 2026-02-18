@@ -193,14 +193,14 @@ function RevealScreen({ events, onRevealComplete }) {
         {events.map((event, index) => (
           <div key={event.id} style={{
             background: "#F5F5F5", border: "1px solid #EEE", borderRadius: "12px",
-            padding: "clamp(0.5rem, 1.2vh, 1rem) clamp(0.7rem, 2vw, 1.25rem)",
-            display: "flex", alignItems: "center", gap: "0.75rem", flex: 1, minHeight: 0, overflow: "hidden",
+            padding: "clamp(0.5rem, 1.2vh, 1rem) clamp(1rem, 3vw, 1.5rem)",
+            display: "flex", alignItems: "center", justifyContent: "center", gap: "0.75rem", flex: 1, minHeight: 0, overflow: "hidden",
             opacity: index < revealed ? 1 : 0, transform: index < revealed ? "translateX(0)" : "translateX(-20px)",
             transition: "all 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
           }}>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: "clamp(0.78rem, 2.2vw, 0.95rem)", fontWeight: 600, color: "#000", fontFamily: "'DM Sans', sans-serif", lineHeight: 1.25 }}>{event.title}</div>
-              <div style={{ fontSize: "clamp(0.6rem, 1.8vw, 0.75rem)", color: "#BBB", marginTop: "0.1rem", fontFamily: "'JetBrains Mono', monospace" }}>{event.hint}</div>
+            <div style={{ flex: 1, textAlign: "center" }}>
+              <div style={{ fontSize: "clamp(0.88rem, 2.5vw, 1.05rem)", fontWeight: 600, color: "#000", fontFamily: "'DM Sans', sans-serif", lineHeight: 1.3 }}>{event.title}</div>
+              <div style={{ fontSize: "clamp(0.65rem, 1.9vw, 0.8rem)", color: "#BBB", marginTop: "0.15rem", fontFamily: "'JetBrains Mono', monospace" }}>{event.hint}</div>
             </div>
           </div>
         ))}
@@ -320,9 +320,7 @@ function DraggableList({ events, lockedCorrect, wrongCards, onReorder, allCorrec
                 {event.hint}{isLocked && <span style={{ color: "#000", marginLeft: "0.5rem", fontWeight: 700 }}>{event.year}</span>}
               </div>
             </div>
-            <div style={{ flexShrink: 0 }}>
-              {isLocked ? <svg width="14" height="14" viewBox="0 0 24 24" fill="#000" stroke="none"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4" fill="none" stroke="#000" strokeWidth="2.5" strokeLinecap="round"/></svg> : <span style={{ color: "#DDD", fontSize: "1rem" }}>⠿</span>}
-            </div>
+            {!isLocked && <div style={{ flexShrink: 0 }}><span style={{ color: "#DDD", fontSize: "1rem" }}>⠿</span></div>}
           </div>
         );
       })}
