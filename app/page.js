@@ -419,7 +419,7 @@ function PlayingScreen({ events, lockedCorrect, wrongCards, onReorder, onLockIn,
             width: "100%", background: "rgba(242,232,255,0.1)", color: "#F2E8FF", border: "1px solid rgba(242,232,255,0.2)", borderRadius: "14px",
             padding: "0.85rem", fontSize: "1rem", fontWeight: 700, cursor: "pointer",
             fontFamily: "'Space Grotesk', sans-serif", letterSpacing: "0.05em", transition: "all 0.2s ease",
-          }}>← Back to results</button>
+          }}>← Back to Score</button>
         ) : (
           <button onClick={onLockIn} style={{
             width: "100%", background: "#FF6B6B", color: "#ffffff", border: "none", borderRadius: "14px",
@@ -507,11 +507,19 @@ function CompleteScreen({ time, attempts, puzzle, onViewChain, firstVisit = true
         opacity: show ? 1 : 0, transform: show ? "translateY(0)" : "translateY(30px)", transition: "all 0.8s cubic-bezier(0.16, 1, 0.3, 1)" }}>
 
         <button onClick={onViewChain} style={{ position: "absolute", top: "1.5rem", left: "1.5rem", background: "none", border: "none", cursor: "pointer", padding: "0.5rem", color: "rgba(242,232,255,0.2)", display: "flex", alignItems: "center" }}>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="8" cy="8" r="5"/><circle cx="16" cy="16" r="5"/></svg>
+          <svg width="20" height="18" viewBox="0 0 20 18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            <line x1="0" y1="1" x2="20" y2="1"/>
+            <line x1="0" y1="4" x2="20" y2="4"/>
+            <line x1="0" y1="7" x2="20" y2="7"/>
+            <line x1="0" y1="10" x2="20" y2="10"/>
+            <line x1="0" y1="13" x2="20" y2="13"/>
+            <line x1="0" y1="16" x2="20" y2="16"/>
+            <line x1="0" y1="19" x2="20" y2="19"/>
+          </svg>
         </button>
 
         {/* Only earned stars — no empty slots */}
-        <StarDisplay stars={stars} size={44} celebrate={true} />
+        <StarDisplay stars={stars} size={44} celebrate={firstVisit} />
 
         {/* Random celebratory word */}
         <div style={{
