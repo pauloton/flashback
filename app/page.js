@@ -394,7 +394,7 @@ function DraggableList({ events, lockedCorrect, wrongCards, onReorder, allCorrec
                 {event.hint}{isLocked && <span style={{ color: "#2D1B4E", marginLeft: "0.5rem", fontWeight: 700 }}>{event.year}</span>}
               </div>
             </div>
-            {!isLocked && <div style={{ flexShrink: 0 }}><span style={{ color: "rgba(242,232,255,0.22)", fontSize: "1rem" }}>⠿</span></div>}
+            {!isLocked && null}
           </div>
         );
       })}
@@ -498,7 +498,7 @@ function CompleteScreen({ time, attempts, puzzle, onViewChain, firstVisit = true
 
   const playerRank = stats?.rankToday || 0;
   const played = stats?.chainsCompleted || 1;
-  const streak = stats?.streak || 1;
+  const bestTime = stats?.bestTime ? formatTime(stats.bestTime).display : display;
 
   return (
     <>
@@ -543,8 +543,8 @@ function CompleteScreen({ time, attempts, puzzle, onViewChain, firstVisit = true
             </div>
             <div style={{ width: "1px", background: "rgba(45,27,78,0.15)" }} />
             <div style={{ textAlign: "center" }}>
-              <div style={{ fontSize: "1rem", fontWeight: 700, color: "#2D1B4E", fontFamily: "'JetBrains Mono', monospace" }}>{streak}</div>
-              <div style={{ fontSize: "0.6rem", color: "rgba(45,27,78,0.4)", fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: "0.1em" }}>Streak</div>
+              <div style={{ fontSize: "1rem", fontWeight: 700, color: "#2D1B4E", fontFamily: "'JetBrains Mono', monospace" }}>{bestTime}</div>
+              <div style={{ fontSize: "0.6rem", color: "rgba(45,27,78,0.4)", fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: "0.1em" }}>Best</div>
             </div>
           </div>
         </div>
@@ -553,7 +553,7 @@ function CompleteScreen({ time, attempts, puzzle, onViewChain, firstVisit = true
           <div style={{ fontSize: "0.6rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(242,232,255,0.28)", fontFamily: "'JetBrains Mono', monospace", marginBottom: "0.6rem", textAlign: "left" }}>Today&apos;s Top 5</div>
           <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
             {todayLB.length === 0 && (
-              <div style={{ padding: "0.75rem", color: "rgba(242,232,255,0.25)", fontSize: "0.75rem", fontFamily: "'JetBrains Mono', monospace" }}>No scores yet - you are the pioneer!</div>
+              <div style={{ padding: "0.75rem", color: "rgba(242,232,255,0.25)", fontSize: "0.75rem", fontFamily: "'JetBrains Mono', monospace" }}>No other scores yet. You are the first!</div>
             )}
             {todayLB.slice(0, 5).map((entry, i) => (
               <div key={i} style={{ display: "flex", alignItems: "center", padding: "0.5rem 0.75rem", background: i === 0 ? "rgba(242,232,255,0.07)" : "transparent", borderRadius: "8px" }}>
@@ -576,7 +576,7 @@ function CompleteScreen({ time, attempts, puzzle, onViewChain, firstVisit = true
         </div>
 
         {/* Rotating CTA above share buttons */}
-        <div style={{ fontSize: "0.8rem", fontWeight: 700, color: "rgba(242,232,255,0.5)", fontFamily: "'Space Grotesk', sans-serif", marginBottom: "0.6rem", letterSpacing: "0.03em" }}>
+        <div style={{ fontSize: "1rem", fontWeight: 700, color: "#F2E8FF", fontFamily: "'Space Grotesk', sans-serif", marginBottom: "0.6rem", letterSpacing: "0.03em" }}>
           {SHARE_CTAS[Math.floor(Math.random() * SHARE_CTAS.length)]}
         </div>
         <ShareIcons stars={stars} time={time} date={puzzle.date} />
