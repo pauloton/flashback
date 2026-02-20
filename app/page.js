@@ -402,7 +402,7 @@ function DraggableList({ events, lockedCorrect, wrongCards, onReorder, allCorrec
   );
 }
 
-function PlayingScreen({ events, lockedCorrect, wrongCards, onReorder, onLockIn, timeDisplay }) {
+function PlayingScreen({ events, lockedCorrect, wrongCards, onReorder, onLockIn, timeDisplay, isReadOnly = false, onBackToResults }) {
   return (
     <div style={{ width: "100%", maxWidth: "440px", margin: "0 auto", padding: "0.75rem 0.75rem", height: "100dvh", display: "flex", flexDirection: "column", overflow: "hidden" }}>
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: "0.5rem", flexShrink: 0 }}>
@@ -414,11 +414,19 @@ function PlayingScreen({ events, lockedCorrect, wrongCards, onReorder, onLockIn,
       </div>
       <DraggableList events={events} lockedCorrect={lockedCorrect} wrongCards={wrongCards} onReorder={onReorder} allCorrect={Object.keys(lockedCorrect).length === 7} />
       <div style={{ paddingTop: "0.6rem", paddingBottom: "env(safe-area-inset-bottom, 0.5rem)", flexShrink: 0 }}>
-        <button onClick={onLockIn} style={{
-          width: "100%", background: "#FF6B6B", color: "#ffffff", border: "none", borderRadius: "14px",
-          padding: "0.85rem", fontSize: "1rem", fontWeight: 700, cursor: "pointer",
-          fontFamily: "'Space Grotesk', sans-serif", letterSpacing: "0.05em", transition: "all 0.2s ease",
-        }}>Lock it in!</button>
+        {isReadOnly ? (
+          <button onClick={onBackToResults} style={{
+            width: "100%", background: "rgba(242,232,255,0.1)", color: "#F2E8FF", border: "1px solid rgba(242,232,255,0.2)", borderRadius: "14px",
+            padding: "0.85rem", fontSize: "1rem", fontWeight: 700, cursor: "pointer",
+            fontFamily: "'Space Grotesk', sans-serif", letterSpacing: "0.05em", transition: "all 0.2s ease",
+          }}>← Back to results</button>
+        ) : (
+          <button onClick={onLockIn} style={{
+            width: "100%", background: "#FF6B6B", color: "#ffffff", border: "none", borderRadius: "14px",
+            padding: "0.85rem", fontSize: "1rem", fontWeight: 700, cursor: "pointer",
+            fontFamily: "'Space Grotesk', sans-serif", letterSpacing: "0.05em", transition: "all 0.2s ease",
+          }}>Lock it in!</button>
+        )}
       </div>
     </div>
   );
@@ -464,7 +472,7 @@ function ShareIcons({ stars, time, date }) {
 // ============================================================
 // SCREEN: RESULTS
 // ============================================================
-function CompleteScreen({ time, attempts, puzzle, onViewChain }) {
+function CompleteScreen({ time, attempts, puzzle, onViewChain, firstVisit = true, onMount }) {
   const [show, setShow] = useState(false);
   const [showCelebWord, setShowCelebWord] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
@@ -476,8 +484,13 @@ function CompleteScreen({ time, attempts, puzzle, onViewChain }) {
 
   useEffect(() => {
     setTimeout(() => setShow(true), 300);
-    setTimeout(() => { setShowCelebWord(true); setShowConfetti(true); }, 500);
-    setTimeout(() => setShowConfetti(false), 3500);
+    if (firstVisit) {
+      setTimeout(() => { setShowCelebWord(true); setShowConfetti(true); }, 500);
+      setTimeout(() => setShowConfetti(false), 3500);
+      if (onMount) onMount();
+    } else {
+      setShowCelebWord(true);
+    }
     fetch("/api/leaderboard?type=today&limit=5").then(r => r.json()).then(d => setTodayLB(d.leaderboard || [])).catch(() => {});
     const pid = getPlayerId();
     fetch(`/api/player?id=${pid}`).then(r => r.json()).then(setStats).catch(() => {});
@@ -568,7 +581,7 @@ function CompleteScreen({ time, attempts, puzzle, onViewChain }) {
 // ============================================================
 // APP ROOT
 // ============================================================
-const SCREENS = { LOADING: "loading", ERROR: "error", INTRO: "intro", REVEAL: "reveal", PLAYING: "playing", COMPLETE: "complete" };
+const SCREENS = { LOADING: "loading", ERROR: "error", INTRO: "intro", REVEAL: "reveal", PLAYING: "playing", CHAIN_VIEW: "chain_view", COMPLETE: "complete" };
 
 export default function FlashBackApp() {
   const [screen, setScreen] = useState(SCREENS.LOADING);
@@ -581,6 +594,7 @@ export default function FlashBackApp() {
   const [lockedCorrect, setLockedCorrect] = useState({});
   const [wrongCards, setWrongCards] = useState({});
   const [scoreSubmitted, setScoreSubmitted] = useState(false);
+  const confettiShown = useRef(false);
   const timer = useTimer();
 
   useEffect(() => {
@@ -628,7 +642,8 @@ export default function FlashBackApp() {
     }
   };
 
-  const handleViewChain = () => setScreen(SCREENS.PLAYING);
+  const handleViewChain = () => setScreen(SCREENS.CHAIN_VIEW);
+  const handleBackToResults = () => setScreen(SCREENS.COMPLETE);
 
   return (
     <div style={{ background: "#2D1B4E", minHeight: "100dvh", color: "#F2E8FF", fontFamily: "'DM Sans', sans-serif", overflow: "hidden" }}>
@@ -641,7 +656,12 @@ export default function FlashBackApp() {
         <PlayingScreen events={events} lockedCorrect={lockedCorrect} wrongCards={wrongCards}
           onReorder={handleReorder} onLockIn={handleLockIn} timeDisplay={formatTime(timer.time).display} />
       )}
-      {screen === SCREENS.COMPLETE && <CompleteScreen time={timer.time} attempts={attempts} puzzle={puzzle} onViewChain={handleViewChain} />}
+      {screen === SCREENS.CHAIN_VIEW && (
+        <PlayingScreen events={events} lockedCorrect={lockedCorrect} wrongCards={{}}
+          onReorder={() => {}} onLockIn={() => {}} timeDisplay={formatTime(timer.time).display}
+          isReadOnly={true} onBackToResults={handleBackToResults} />
+      )}
+      {screen === SCREENS.COMPLETE && <CompleteScreen time={timer.time} attempts={attempts} puzzle={puzzle} onViewChain={handleViewChain} firstVisit={!confettiShown.current} onMount={() => { confettiShown.current = true; }} />}
     </div>
   );
 }
