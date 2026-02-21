@@ -21,12 +21,34 @@ function formatTime(ms) {
   return { mins, secs, centis, display: `${mins}:${secs.toString().padStart(2, "0")}.${centis.toString().padStart(2, "0")}` };
 }
 
-// ── Stars now based on time, not attempts ──────────────────
-function getStars(ms) {
-  const secs = ms / 1000;
-  if (secs < 30) return 3;
-  if (secs < 60) return 2;
+// ── Stars based on failed attempts, not time ──────────────────
+// 0 wrong = 3 stars, 1 wrong = 2 stars, 2 wrong = 1 star, 3 wrong = game over
+function getStars(failedAttempts) {
+  if (failedAttempts === 0) return 3;
+  if (failedAttempts === 1) return 2;
   return 1;
+}
+
+const MAX_ATTEMPTS = 3; // game over after this many failed lock-ins
+
+function getStats() {
+  if (typeof window === "undefined") return { played: 0, perfects: 0, best: null };
+  try {
+    return {
+      played:   parseInt(localStorage.getItem("flashback_played")   || "0", 10),
+      perfects: parseInt(localStorage.getItem("flashback_perfects") || "0", 10),
+      best:     parseInt(localStorage.getItem("flashback_best")     || "0", 10) || null,
+    };
+  } catch { return { played: 0, perfects: 0, best: null }; }
+}
+function saveStats(timeMs, stars) {
+  if (typeof window === "undefined") return;
+  try {
+    const prev = getStats();
+    localStorage.setItem("flashback_played",   String(prev.played + 1));
+    localStorage.setItem("flashback_perfects", String(prev.perfects + (stars === 3 ? 1 : 0)));
+    if (timeMs && stars > 0 && (!prev.best || timeMs < prev.best)) localStorage.setItem("flashback_best", String(timeMs));
+  } catch {}
 }
 
 function useTimer() {
@@ -402,12 +424,57 @@ function DraggableList({ events, lockedCorrect, wrongCards, onReorder, allCorrec
   );
 }
 
-function PlayingScreen({ events, lockedCorrect, wrongCards, onReorder, onLockIn, timeDisplay, isReadOnly = false, onBackToResults }) {
+// ── Live stars shown during gameplay (burn one per wrong attempt) ──
+function LiveStars({ failedAttempts }) {
+  return (
+    <div style={{ display: "flex", gap: "5px", alignItems: "center" }}>
+      {Array.from({ length: MAX_ATTEMPTS }, (_, i) => {
+        const active = i < (MAX_ATTEMPTS - failedAttempts);
+        return (
+          <svg key={i} width="18" height="18" viewBox="0 0 24 24"
+            fill={active ? "#F2C94C" : "none"}
+            stroke={active ? "#F2C94C" : "rgba(242,232,255,0.2)"}
+            strokeWidth="2" strokeLinejoin="round"
+            style={{ transition: "all 0.35s cubic-bezier(0.34,1.56,0.64,1)", transform: active ? "scale(1)" : "scale(0.8)", opacity: active ? 1 : 0.3 }}>
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+          </svg>
+        );
+      })}
+    </div>
+  );
+}
+
+// ── Game Over screen ──
+function GameOverScreen({ events, onViewChain, onMount }) {
+  const hasRun = useRef(false);
+  useEffect(() => {
+    if (!hasRun.current) { hasRun.current = true; onMount(); saveStats(null, 0); }
+  }, [onMount]);
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "100dvh", padding: "2rem", textAlign: "center" }}>
+      <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: "3rem", fontWeight: 900, color: "#FF6B6B", letterSpacing: "-0.02em", lineHeight: 1, marginBottom: "0.5rem", textShadow: "0 2px 24px rgba(255,107,107,0.4)" }}>
+        GAME OVER
+      </div>
+      <div style={{ fontSize: "0.85rem", color: "rgba(242,232,255,0.3)", fontFamily: "'DM Sans', sans-serif", marginBottom: "2rem" }}>
+        Better luck tomorrow
+      </div>
+      <button onClick={onViewChain} style={{ background: "rgba(242,232,255,0.07)", border: "1px solid rgba(242,232,255,0.15)", borderRadius: "14px", padding: "0.85rem 2rem", color: "#F2E8FF", fontFamily: "'Space Grotesk', sans-serif", fontSize: "1rem", fontWeight: 700, cursor: "pointer", letterSpacing: "0.01em", width: "100%", maxWidth: "340px" }}>
+        See The Right Order
+      </button>
+      <div style={{ marginTop: "1rem", fontFamily: "'JetBrains Mono', monospace", fontSize: "0.7rem", color: "rgba(242,232,255,0.2)", letterSpacing: "0.1em" }}>
+        NEXT CHAIN AT MIDNIGHT
+      </div>
+    </div>
+  );
+}
+
+function PlayingScreen({ events, lockedCorrect, wrongCards, onReorder, onLockIn, timeDisplay, failedAttempts = 0, isReadOnly = false, onBackToResults }) {
   return (
     <div style={{ width: "100%", maxWidth: "440px", margin: "0 auto", padding: "0.75rem 0.75rem", height: "100dvh", display: "flex", flexDirection: "column", overflow: "hidden" }}>
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: "0.5rem", flexShrink: 0 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.5rem", flexShrink: 0 }}>
+        <LiveStars failedAttempts={failedAttempts} />
         <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "1.4rem", fontWeight: 700, color: "#F2E8FF" }}>{timeDisplay}</div>
-        <div style={{ fontSize: "0.6rem", color: "rgba(242,232,255,0.28)", letterSpacing: "0.2em", textTransform: "uppercase", fontFamily: "'JetBrains Mono', monospace", marginTop: "0.15rem" }}>{todayTagline}</div>
       </div>
       <div style={{ height: "3px", background: "rgba(242,232,255,0.12)", borderRadius: "2px", marginBottom: "0.6rem", overflow: "hidden", flexShrink: 0 }}>
         <div style={{ height: "100%", width: `${(Object.keys(lockedCorrect).length / 7) * 100}%`, background: "#F2C94C", borderRadius: "2px", transition: "width 0.5s cubic-bezier(0.16, 1, 0.3, 1)" }} />
@@ -472,13 +539,13 @@ function ShareIcons({ stars, time, date }) {
 // ============================================================
 // SCREEN: RESULTS
 // ============================================================
-function CompleteScreen({ time, attempts, puzzle, onViewChain, firstVisit = true, onMount }) {
+function CompleteScreen({ time, failedAttempts, puzzle, onViewChain, firstVisit = true, onMount }) {
   const [show, setShow] = useState(false);
   const [showCelebWord, setShowCelebWord] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const [todayLB, setTodayLB] = useState([]);
   const [stats, setStats] = useState(null);
-  const stars = getStars(time);
+  const stars = getStars(failedAttempts);
   const { display } = formatTime(time);
   const [celebWord] = useState(() => getCelebWord(stars));
 
@@ -488,6 +555,7 @@ function CompleteScreen({ time, attempts, puzzle, onViewChain, firstVisit = true
       setTimeout(() => { setShowCelebWord(true); setShowConfetti(true); }, 500);
       setTimeout(() => setShowConfetti(false), 3500);
       if (onMount) onMount();
+      saveStats(time, stars);
     } else {
       setShowCelebWord(true);
     }
@@ -589,7 +657,7 @@ function CompleteScreen({ time, attempts, puzzle, onViewChain, firstVisit = true
 // ============================================================
 // APP ROOT
 // ============================================================
-const SCREENS = { LOADING: "loading", ERROR: "error", INTRO: "intro", REVEAL: "reveal", PLAYING: "playing", CHAIN_VIEW: "chain_view", COMPLETE: "complete" };
+const SCREENS = { LOADING: "loading", ERROR: "error", INTRO: "intro", REVEAL: "reveal", PLAYING: "playing", CHAIN_VIEW: "chain_view", COMPLETE: "complete", GAME_OVER: "game_over" };
 
 export default function FlashBackApp() {
   const [screen, setScreen] = useState(SCREENS.LOADING);
@@ -598,11 +666,12 @@ export default function FlashBackApp() {
   const [yearMap, setYearMap] = useState({});
   const [events, setEvents] = useState([]);
   const [revealEvents, setRevealEvents] = useState([]);
-  const [attempts, setAttempts] = useState(0);
+  const [failedAttempts, setFailedAttempts] = useState(0);
   const [lockedCorrect, setLockedCorrect] = useState({});
   const [wrongCards, setWrongCards] = useState({});
   const [scoreSubmitted, setScoreSubmitted] = useState(false);
   const confettiShown = useRef(false);
+  const gameOverShown = useRef(false);
   const timer = useTimer();
 
   useEffect(() => {
@@ -629,24 +698,38 @@ export default function FlashBackApp() {
   const handleReorder = useCallback((newEvents) => setEvents(newEvents), []);
 
   const handleLockIn = () => {
-    const newAttempts = attempts + 1; setAttempts(newAttempts);
     const newLocked = { ...lockedCorrect }; const newWrong = {};
+    let anyNewCorrect = false;
     events.forEach((ev, i) => {
       if (lockedCorrect[ev.id]) return;
-      if (ev.id === answerOrder[i]) newLocked[ev.id] = true;
+      if (ev.id === answerOrder[i]) { newLocked[ev.id] = true; anyNewCorrect = true; }
       else newWrong[ev.id] = true;
     });
     setLockedCorrect(newLocked); setWrongCards(newWrong);
     setTimeout(() => setWrongCards({}), 800);
-    if (Object.keys(newLocked).length === 7) {
+
+    const allCorrect = Object.keys(newLocked).length === 7;
+    if (allCorrect) {
       timer.stop();
       if (!scoreSubmitted) {
         setScoreSubmitted(true);
         fetch("/api/score", { method: "POST", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ playerId: getPlayerId(), date: puzzle.date, time: timer.time, attempts: newAttempts, stars: getStars(timer.time) }),
+          body: JSON.stringify({ playerId: getPlayerId(), date: puzzle.date, time: timer.time, attempts: failedAttempts, stars: getStars(failedAttempts) }),
         }).catch(() => {});
       }
       setTimeout(() => setScreen(SCREENS.COMPLETE), 3200);
+      return;
+    }
+
+    // Wrong — burn a star
+    const newFailed = failedAttempts + 1;
+    setFailedAttempts(newFailed);
+    if (newFailed >= MAX_ATTEMPTS) {
+      timer.stop();
+      // Sort events into correct order for game over display
+      const sorted = [...answerOrder].map(id => events.find(ev => ev.id === id)).filter(Boolean);
+      setEvents(sorted);
+      setTimeout(() => setScreen(SCREENS.GAME_OVER), 1000);
     }
   };
 
@@ -662,14 +745,15 @@ export default function FlashBackApp() {
       {screen === SCREENS.REVEAL && <RevealScreen events={revealEvents} onRevealComplete={handleRevealComplete} />}
       {screen === SCREENS.PLAYING && (
         <PlayingScreen events={events} lockedCorrect={lockedCorrect} wrongCards={wrongCards}
-          onReorder={handleReorder} onLockIn={handleLockIn} timeDisplay={formatTime(timer.time).display} />
+          onReorder={handleReorder} onLockIn={handleLockIn} timeDisplay={formatTime(timer.time).display} failedAttempts={failedAttempts} />
       )}
       {screen === SCREENS.CHAIN_VIEW && (
         <PlayingScreen events={events} lockedCorrect={lockedCorrect} wrongCards={{}}
           onReorder={() => {}} onLockIn={() => {}} timeDisplay={formatTime(timer.time).display}
           isReadOnly={true} onBackToResults={handleBackToResults} />
       )}
-      {screen === SCREENS.COMPLETE && <CompleteScreen time={timer.time} attempts={attempts} puzzle={puzzle} onViewChain={handleViewChain} firstVisit={!confettiShown.current} onMount={() => { confettiShown.current = true; }} />}
+      {screen === SCREENS.COMPLETE && <CompleteScreen time={timer.time} failedAttempts={failedAttempts} puzzle={puzzle} onViewChain={handleViewChain} firstVisit={!confettiShown.current} onMount={() => { confettiShown.current = true; }} />}
+      {screen === SCREENS.GAME_OVER && <GameOverScreen events={events} onViewChain={handleViewChain} onMount={() => { gameOverShown.current = true; }} />}
     </div>
   );
 }
