@@ -206,7 +206,7 @@ function ErrorScreen({ message }) {
 // ============================================================
 // SCREEN: INTRO
 // ============================================================
-function AnimatedLogo() {
+function AnimatedLogo({ onSolved }) {
   const letters = "FLASHBACK".split("");
   const [positions, setPositions] = useState(() => {
     const indices = letters.map((_, i) => i);
@@ -225,7 +225,7 @@ function AnimatedLogo() {
           setPositions([...current]); step++; break;
         } else { step++; }
       }
-      if (current.every((v, i) => v === i)) { clearInterval(interval); setSolved(true); }
+      if (current.every((v, i) => v === i)) { clearInterval(interval); setSolved(true); if (onSolved) onSolved(); }
     }, 245);
     return () => clearInterval(interval);
   }, []);
@@ -255,23 +255,72 @@ function AnimatedLogo() {
 
 function IntroScreen({ onStart, puzzle }) {
   const [show, setShow] = useState(false);
+  const [logoSolved, setLogoSolved] = useState(false);
+  const [lineCount, setLineCount] = useState(0);
+
   useEffect(() => { setTimeout(() => setShow(true), 100); }, []);
+
+  useEffect(() => {
+    if (!logoSolved) return;
+    const timers = [
+      setTimeout(() => setLineCount(1), 350),
+      setTimeout(() => setLineCount(2), 750),
+      setTimeout(() => setLineCount(3), 1150),
+    ];
+    return () => timers.forEach(clearTimeout);
+  }, [logoSolved]);
+
+  const dateLabel = new Date(puzzle.date + "T12:00:00").toLocaleDateString("en-US", {
+    weekday: "long", month: "long", day: "numeric", year: "numeric"
+  });
+
+  const lines = [
+    "Seven historical events",
+    "Out of order",
+    "Beat the clock",
+  ];
+
   return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "100dvh", padding: "2rem", textAlign: "center",
-      opacity: show ? 1 : 0, transform: show ? "translateY(0)" : "translateY(20px)", transition: "all 0.8s cubic-bezier(0.16, 1, 0.3, 1)" }}>
-      <AnimatedLogo />
-      <p style={{ fontSize: "1rem", color: "rgba(242,232,255,0.35)", lineHeight: 1.5, margin: "0 0 2.5rem 0", fontFamily: "'DM Sans', sans-serif", fontStyle: "italic" }}>{todayTagline}</p>
-      <div style={{ fontSize: "0.85rem", color: "rgba(242,232,255,0.2)", fontFamily: "'JetBrains Mono', monospace", marginBottom: "2.5rem" }}>
-        {new Date(puzzle.date + "T12:00:00").toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", minHeight: "100dvh", padding: "0",
+      opacity: show ? 1 : 0, transition: "opacity 0.8s ease" }}>
+
+      {/* Date — very top */}
+      <div style={{ width: "100%", textAlign: "center", paddingTop: "clamp(2rem, 7vh, 3.5rem)",
+        fontSize: "0.72rem", color: "rgba(242,232,255,0.25)", fontFamily: "'JetBrains Mono', monospace", letterSpacing: "0.06em" }}>
+        {dateLabel}
       </div>
-      <button onClick={onStart} style={{
-        background: "#FF6B6B", color: "#ffffff", border: "none", borderRadius: "16px", padding: "1rem 3rem",
-        fontSize: "1.1rem", fontWeight: 700, cursor: "pointer", fontFamily: "'Space Grotesk', sans-serif",
-        letterSpacing: "0.05em", transition: "all 0.2s ease",
-      }}
-        onMouseEnter={e => { e.target.style.transform = "scale(1.05)"; }}
-        onMouseLeave={e => { e.target.style.transform = "scale(1)"; }}
-      >START</button>
+
+      {/* Logo + 3 lines — vertically centered */}
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+        gap: "clamp(1rem, 3vh, 1.8rem)", paddingBottom: "clamp(6rem, 16vh, 10rem)" }}>
+        <AnimatedLogo onSolved={() => setLogoSolved(true)} />
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "0.35rem" }}>
+          {lines.map((line, i) => (
+            <div key={i} style={{
+              fontSize: "1.05rem", fontWeight: 600, color: "rgba(242,232,255,0.45)",
+              fontFamily: "'Space Grotesk', sans-serif",
+              opacity: i < lineCount ? 1 : 0,
+              transform: i < lineCount ? "translateY(0)" : "translateY(10px)",
+              transition: "opacity 0.45s ease, transform 0.45s ease",
+            }}>{line}</div>
+          ))}
+        </div>
+      </div>
+
+      {/* Button — anchored near the bottom */}
+      <div style={{ position: "absolute", bottom: "clamp(4rem, 11vh, 7rem)",
+        display: "flex", justifyContent: "center", width: "100%" }}>
+        <button onClick={onStart} style={{
+          background: "#FF6B6B", color: "#ffffff", border: "none", borderRadius: "16px",
+          padding: "1rem 2.5rem", fontSize: "1.05rem", fontWeight: 700, cursor: "pointer",
+          fontFamily: "'Space Grotesk', sans-serif", letterSpacing: "0.05em",
+          transition: "transform 0.2s ease", boxShadow: "0 4px 24px rgba(255,107,107,0.4)",
+          width: "clamp(220px, 65vw, 300px)",
+        }}
+          onMouseEnter={e => { e.target.style.transform = "scale(1.05)"; }}
+          onMouseLeave={e => { e.target.style.transform = "scale(1)"; }}
+        >FIX THE TIMELINE!</button>
+      </div>
     </div>
   );
 }
