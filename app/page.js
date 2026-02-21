@@ -501,18 +501,23 @@ function GameOverScreen({ events, onViewChain, onMount }) {
   }, [onMount]);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "100dvh", padding: "2rem", textAlign: "center" }}>
-      <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: "3rem", fontWeight: 900, color: "#FF6B6B", letterSpacing: "-0.02em", lineHeight: 1, marginBottom: "0.5rem", textShadow: "0 2px 24px rgba(255,107,107,0.4)" }}>
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "100dvh", padding: "2rem", textAlign: "center", gap: "1.5rem" }}>
+      <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: "3.5rem", fontWeight: 900, color: "#FF6B6B", letterSpacing: "-0.02em", lineHeight: 1, textShadow: "0 2px 32px rgba(255,107,107,0.5)" }}>
         GAME OVER
       </div>
-      <div style={{ fontSize: "0.85rem", color: "rgba(242,232,255,0.3)", fontFamily: "'DM Sans', sans-serif", marginBottom: "2rem" }}>
-        Better luck tomorrow
-      </div>
-      <button onClick={onViewChain} style={{ background: "rgba(242,232,255,0.07)", border: "1px solid rgba(242,232,255,0.15)", borderRadius: "14px", padding: "0.85rem 2rem", color: "#F2E8FF", fontFamily: "'Space Grotesk', sans-serif", fontSize: "1rem", fontWeight: 700, cursor: "pointer", letterSpacing: "0.01em", width: "100%", maxWidth: "340px" }}>
-        See The Right Order
+      <button onClick={onViewChain} style={{
+        background: "rgba(242,232,255,0.07)", border: "1px solid rgba(242,232,255,0.2)", borderRadius: "14px",
+        padding: "1rem 2rem", color: "#F2E8FF", fontFamily: "'Space Grotesk', sans-serif",
+        fontSize: "1rem", fontWeight: 700, cursor: "pointer", letterSpacing: "0.01em",
+        width: "100%", maxWidth: "340px", transition: "all 0.2s ease",
+      }}
+        onMouseEnter={e => { e.currentTarget.style.background = "rgba(242,232,255,0.12)"; }}
+        onMouseLeave={e => { e.currentTarget.style.background = "rgba(242,232,255,0.07)"; }}
+      >
+        Check the Right Timeline
       </button>
-      <div style={{ marginTop: "1rem", fontFamily: "'JetBrains Mono', monospace", fontSize: "0.7rem", color: "rgba(242,232,255,0.2)", letterSpacing: "0.1em" }}>
-        NEXT CHAIN AT MIDNIGHT
+      <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "0.75rem", color: "rgba(242,232,255,0.25)", letterSpacing: "0.12em", textTransform: "uppercase" }}>
+        Try Again Tomorrow
       </div>
     </div>
   );
