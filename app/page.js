@@ -282,7 +282,7 @@ function IntroScreen({ onStart, puzzle }) {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", minHeight: "100dvh", padding: "0",
-      opacity: show ? 1 : 0, transition: "opacity 0.8s ease" }}>
+      position: "relative", opacity: show ? 1 : 0, transition: "opacity 0.8s ease" }}>
 
       {/* Date — very top */}
       <div style={{ width: "100%", textAlign: "center", paddingTop: "clamp(2rem, 7vh, 3.5rem)",
