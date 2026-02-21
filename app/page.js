@@ -275,9 +275,9 @@ function IntroScreen({ onStart, puzzle }) {
   });
 
   const lines = [
-    "Seven historical events",
-    "Out of order",
-    "Beat the clock",
+    "Seven Historical Events",
+    "Sort Them",
+    "Beat The Clock!",
   ];
 
   return (
@@ -735,7 +735,7 @@ export default function FlashBackApp() {
     const evts = puzzle.events.map(e => ({ ...e, year: yearMap[e.id] }));
     const shuffled = shuffleArray(evts);
     setEvents(shuffled); setRevealEvents(shuffled);
-    setAttempts(0); setLockedCorrect({}); setWrongCards({});
+    setFailedAttempts(0); setLockedCorrect({}); setWrongCards({});
     setScreen(SCREENS.REVEAL);
   };
 
