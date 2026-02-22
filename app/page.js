@@ -788,6 +788,14 @@ export default function FlashBackApp() {
   };
 
   const handleViewChain = () => setScreen(SCREENS.CHAIN_VIEW);
+  const handleViewCorrectChain = () => {
+    // Sort events into the correct answer order and lock them all
+    const sorted = [...answerOrder].map(id => events.find(ev => ev.id === id)).filter(Boolean);
+    setEvents(sorted);
+    const allLocked = Object.fromEntries(sorted.map(ev => [ev.id, true]));
+    setLockedCorrect(allLocked);
+    setScreen(SCREENS.CHAIN_VIEW);
+  };
   const handleBackToResults = () => setScreen(SCREENS.COMPLETE);
 
   return (
@@ -807,7 +815,7 @@ export default function FlashBackApp() {
           isReadOnly={true} onBackToResults={handleBackToResults} />
       )}
       {screen === SCREENS.COMPLETE && <CompleteScreen time={timer.time} failedAttempts={failedAttempts} puzzle={puzzle} onViewChain={handleViewChain} firstVisit={!confettiShown.current} onMount={() => { confettiShown.current = true; }} />}
-      {screen === SCREENS.GAME_OVER && <GameOverScreen events={events} onViewChain={handleViewChain} onMount={() => { gameOverShown.current = true; }} />}
+      {screen === SCREENS.GAME_OVER && <GameOverScreen events={events} onViewChain={handleViewCorrectChain} onMount={() => { gameOverShown.current = true; }} />}
     </div>
   );
 }
