@@ -538,7 +538,7 @@ function GameOverScreen({ events, onViewChain, onMount }) {
   );
 }
 
-function PlayingScreen({ events, lockedCorrect, wrongCards, onReorder, onLockIn, timeDisplay, failedAttempts = 0, isReadOnly = false, onBackToResults }) {
+function PlayingScreen({ events, lockedCorrect, wrongCards, onReorder, onLockIn, timeDisplay, failedAttempts = 0, isReadOnly = false, onBackToResults, playerWon = false }) {
   return (
     <div style={{ width: "100%", maxWidth: "440px", margin: "0 auto", padding: "0.75rem 0.75rem", height: "100dvh", display: "flex", flexDirection: "column", overflow: "hidden" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.5rem", flexShrink: 0 }}>
@@ -551,15 +551,23 @@ function PlayingScreen({ events, lockedCorrect, wrongCards, onReorder, onLockIn,
       <DraggableList events={events} lockedCorrect={lockedCorrect} wrongCards={wrongCards} onReorder={onReorder} allCorrect={Object.keys(lockedCorrect).length === 7} />
       <div style={{ paddingTop: "0.6rem", paddingBottom: "env(safe-area-inset-bottom, 0.5rem)", flexShrink: 0 }}>
         {isReadOnly ? (
-          <button onClick={() => {
-            const msg = "I failed FlashBack today. How about you? 👀\nhttps://flashback.game";
-            if (navigator.share) { navigator.share({ text: msg }); }
-            else { navigator.clipboard.writeText(msg); alert("Copied to clipboard!"); }
-          }} style={{
-            width: "100%", background: "#FF6B6B", color: "#ffffff", border: "none", borderRadius: "14px",
-            padding: "0.85rem", fontSize: "1rem", fontWeight: 700, cursor: "pointer",
-            fontFamily: "'Space Grotesk', sans-serif", letterSpacing: "0.05em", transition: "all 0.2s ease",
-          }}>Invite Others to Play</button>
+          playerWon ? (
+            <button onClick={onBackToResults} style={{
+              width: "100%", background: "rgba(242,232,255,0.1)", color: "#F2E8FF", border: "1px solid rgba(242,232,255,0.2)", borderRadius: "14px",
+              padding: "0.85rem", fontSize: "1rem", fontWeight: 700, cursor: "pointer",
+              fontFamily: "'Space Grotesk', sans-serif", letterSpacing: "0.05em", transition: "all 0.2s ease",
+            }}>← Back to your Score</button>
+          ) : (
+            <button onClick={() => {
+              const msg = "I failed FlashBack today. How about you? 👀\nhttps://flashback.game";
+              if (navigator.share) { navigator.share({ text: msg }); }
+              else { navigator.clipboard.writeText(msg); alert("Copied to clipboard!"); }
+            }} style={{
+              width: "100%", background: "#FF6B6B", color: "#ffffff", border: "none", borderRadius: "14px",
+              padding: "0.85rem", fontSize: "1rem", fontWeight: 700, cursor: "pointer",
+              fontFamily: "'Space Grotesk', sans-serif", letterSpacing: "0.05em", transition: "all 0.2s ease",
+            }}>Invite Others to Play</button>
+          )
         ) : (
           <button onClick={onLockIn} style={{
             width: "100%", background: "#FF6B6B", color: "#ffffff", border: "none", borderRadius: "14px",
@@ -714,12 +722,17 @@ function CompleteScreen({ time, failedAttempts, puzzle, onViewChain, firstVisit 
         <div style={{ width: "100%", maxWidth: "340px", marginBottom: "1.5rem" }}>
           <div style={{ fontSize: "0.6rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(242,232,255,0.28)", fontFamily: "'JetBrains Mono', monospace", marginBottom: "0.6rem", textAlign: "left" }}>Your Top 5</div>
           <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-            {[1,2,3,4,5].map(i => (
-              <div key={i} style={{ display: "flex", alignItems: "center", padding: "0.5rem 0.75rem", background: i === 1 ? "rgba(242,232,255,0.07)" : "transparent", borderRadius: "8px" }}>
-                <div style={{ width: "24px", fontSize: "0.7rem", fontWeight: 700, color: i === 1 ? "#F2E8FF" : "rgba(242,232,255,0.25)", fontFamily: "'JetBrains Mono', monospace" }}>{i}</div>
-                <div style={{ flex: 1, fontSize: "0.75rem", color: "rgba(242,232,255,0.25)", fontFamily: "'DM Sans', sans-serif", textAlign: "left" }}>—</div>
-              </div>
-            ))}
+            {(() => {
+              const times = JSON.parse(typeof localStorage !== "undefined" ? localStorage.getItem("flashback_times") || "[]" : "[]");
+              return [0,1,2,3,4].map(i => (
+                <div key={i} style={{ display: "flex", alignItems: "center", padding: "0.5rem 0.75rem", background: i === 0 ? "rgba(242,232,255,0.07)" : "transparent", borderRadius: "8px" }}>
+                  <div style={{ width: "24px", fontSize: "0.7rem", fontWeight: 700, color: i === 0 ? "#F2E8FF" : "rgba(242,232,255,0.25)", fontFamily: "'JetBrains Mono', monospace" }}>{i + 1}</div>
+                  <div style={{ flex: 1, fontSize: "0.75rem", color: i === 0 ? "#F2E8FF" : "rgba(242,232,255,0.35)", fontFamily: "'JetBrains Mono', monospace", textAlign: "left" }}>
+                    {times[i] ? formatTime(times[i]).display : "—"}
+                  </div>
+                </div>
+              ));
+            })()}
           </div>
         </div>
 
@@ -748,6 +761,7 @@ export default function FlashBackApp() {
   const [scoreSubmitted, setScoreSubmitted] = useState(false);
   const confettiShown = useRef(false);
   const gameOverShown = useRef(false);
+  const prevScreen = useRef(null);
   const timer = useTimer();
 
   useEffect(() => {
@@ -809,13 +823,14 @@ export default function FlashBackApp() {
     }
   };
 
-  const handleViewChain = () => setScreen(SCREENS.CHAIN_VIEW);
+  const handleViewChain = () => { prevScreen.current = SCREENS.COMPLETE; setScreen(SCREENS.CHAIN_VIEW); };
   const handleViewCorrectChain = () => {
     // Sort events into the correct answer order and lock them all
     const sorted = [...answerOrder].map(id => events.find(ev => ev.id === id)).filter(Boolean);
     setEvents(sorted);
     const allLocked = Object.fromEntries(sorted.map(ev => [ev.id, true]));
     setLockedCorrect(allLocked);
+    prevScreen.current = SCREENS.GAME_OVER;
     setScreen(SCREENS.CHAIN_VIEW);
   };
   const handleBackToResults = () => setScreen(SCREENS.COMPLETE);
@@ -834,7 +849,8 @@ export default function FlashBackApp() {
       {screen === SCREENS.CHAIN_VIEW && (
         <PlayingScreen events={events} lockedCorrect={lockedCorrect} wrongCards={{}}
           onReorder={() => {}} onLockIn={() => {}} timeDisplay={formatTime(timer.time).display}
-          isReadOnly={true} onBackToResults={handleBackToResults} />
+          isReadOnly={true} onBackToResults={handleBackToResults}
+          playerWon={prevScreen.current === SCREENS.COMPLETE} />
       )}
       {screen === SCREENS.COMPLETE && <CompleteScreen time={timer.time} failedAttempts={failedAttempts} puzzle={puzzle} onViewChain={handleViewChain} firstVisit={!confettiShown.current} onMount={() => { confettiShown.current = true; }} />}
       {screen === SCREENS.GAME_OVER && <GameOverScreen events={events} onViewChain={handleViewCorrectChain} onMount={() => { gameOverShown.current = true; }} />}
