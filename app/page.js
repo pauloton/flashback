@@ -674,7 +674,7 @@ function CompleteScreen({ time, failedAttempts, puzzle, onViewChain, firstVisit 
           <div style={{ fontSize: "clamp(2.4rem, 8vw, 3.2rem)", fontWeight: 800, color: "#2D1B4E", fontFamily: "'JetBrains Mono', monospace", lineHeight: 1 }}>{display}</div>
           <div style={{ display: "flex", justifyContent: "center", gap: "1.5rem", marginTop: "0.75rem" }}>
             <div style={{ textAlign: "center" }}>
-              <div style={{ fontSize: "1rem", fontWeight: 700, color: "#2D1B4E", fontFamily: "'JetBrains Mono', monospace" }}>{attempts}</div>
+              <div style={{ fontSize: "1rem", fontWeight: 700, color: "#2D1B4E", fontFamily: "'JetBrains Mono', monospace" }}>{failedAttempts}</div>
               <div style={{ fontSize: "0.6rem", color: "rgba(45,27,78,0.5)", fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: "0.1em" }}>Attempts</div>
             </div>
             <div style={{ width: "1px", background: "rgba(45,27,78,0.15)" }} />
