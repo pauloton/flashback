@@ -516,6 +516,21 @@ function GameOverScreen({ events, onViewChain, onMount }) {
       >
         Check the Right Timeline
       </button>
+      <button onClick={() => {
+        const msg = "I failed FlashBack today. How about you? 👀\nhttps://flashback.game";
+        if (navigator.share) { navigator.share({ text: msg }); }
+        else { navigator.clipboard.writeText(msg); alert("Copied to clipboard!"); }
+      }} style={{
+        background: "#FF6B6B", border: "none", borderRadius: "14px",
+        padding: "1rem 2rem", color: "#ffffff", fontFamily: "'Space Grotesk', sans-serif",
+        fontSize: "1rem", fontWeight: 700, cursor: "pointer", letterSpacing: "0.01em",
+        width: "100%", maxWidth: "340px", transition: "all 0.2s ease",
+      }}
+        onMouseEnter={e => { e.currentTarget.style.opacity = "0.85"; }}
+        onMouseLeave={e => { e.currentTarget.style.opacity = "1"; }}
+      >
+        Invite Others to Play
+      </button>
       <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "0.75rem", color: "rgba(242,232,255,0.25)", letterSpacing: "0.12em", textTransform: "uppercase" }}>
         Try Again Tomorrow
       </div>
@@ -536,11 +551,15 @@ function PlayingScreen({ events, lockedCorrect, wrongCards, onReorder, onLockIn,
       <DraggableList events={events} lockedCorrect={lockedCorrect} wrongCards={wrongCards} onReorder={onReorder} allCorrect={Object.keys(lockedCorrect).length === 7} />
       <div style={{ paddingTop: "0.6rem", paddingBottom: "env(safe-area-inset-bottom, 0.5rem)", flexShrink: 0 }}>
         {isReadOnly ? (
-          <button onClick={onBackToResults} style={{
-            width: "100%", background: "rgba(242,232,255,0.1)", color: "#F2E8FF", border: "1px solid rgba(242,232,255,0.2)", borderRadius: "14px",
+          <button onClick={() => {
+            const msg = "I failed FlashBack today. How about you? 👀\nhttps://flashback.game";
+            if (navigator.share) { navigator.share({ text: msg }); }
+            else { navigator.clipboard.writeText(msg); alert("Copied to clipboard!"); }
+          }} style={{
+            width: "100%", background: "#FF6B6B", color: "#ffffff", border: "none", borderRadius: "14px",
             padding: "0.85rem", fontSize: "1rem", fontWeight: 700, cursor: "pointer",
             fontFamily: "'Space Grotesk', sans-serif", letterSpacing: "0.05em", transition: "all 0.2s ease",
-          }}>← Back to Score</button>
+          }}>Invite Others to Play</button>
         ) : (
           <button onClick={onLockIn} style={{
             width: "100%", background: "#FF6B6B", color: "#ffffff", border: "none", borderRadius: "14px",
