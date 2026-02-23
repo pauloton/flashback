@@ -1,5 +1,5 @@
 export const metadata = {
-  title: "FlashBack — Moments That Changed Everything",
+  title: "FlashBack — History is out of order. Fix it!",
   description: "Sort 7 historical events. Race the clock. Challenge the world.",
   viewport: "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no",
 };
