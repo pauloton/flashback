@@ -573,39 +573,68 @@ function PlayingScreen({ events, lockedCorrect, wrongCards, onReorder, onLockIn,
 }
 
 // ============================================================
-// SHARE ICONS
+// SHARE BUTTON
 // ============================================================
-const SHARE_CTAS = [
-  "Share your score!",
-  "Spread the word!",
-  "Share it!",
-  "Pass it on!",
-  "Share the fun!",
-  "Share the chain!",
-  "Share your win!",
+const SHARE_BLURBS = [
+  (t, url) => `I put history back in order in ${t}. How bout you? ${url}`,
+  (t, url) => `I fixed the timeline in ${t}. Your turn? ${url}`,
+  (t, url) => `I put the past in its place in ${t}. What about you? ${url}`,
+  (t, url) => `I untangled history in ${t}. Can you? ${url}`,
 ];
 
-function ShareIcons({ stars, time, date }) {
-  const gameUrl = typeof window !== "undefined" ? window.location.origin : "https://flashback-lemon.vercel.app";
-  const shareText = `I know my history. Do you? 🤓 I solved today's FlashBack in ${formatTime(time).display}. ${gameUrl}`;
-  const encodedText = encodeURIComponent(shareText);
-  const encodedUrl = encodeURIComponent(gameUrl);
-  const c = "rgba(242,232,255,0.5)";
-  const platforms = [
-    { name: "Instagram", action: () => { navigator.clipboard?.writeText(shareText).then(() => { window.open("https://www.instagram.com/", "_blank"); }); }, icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill={c} stroke="none"/></svg> },
-    { name: "WhatsApp", action: () => { window.open(`https://wa.me/?text=${encodedText}`, "_blank"); }, icon: <svg width="18" height="18" viewBox="0 0 24 24" fill={c}><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> },
-    { name: "X", action: () => { window.open(`https://x.com/intent/tweet?text=${encodedText}`, "_blank"); }, icon: <svg width="16" height="16" viewBox="0 0 24 24" fill={c}><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg> },
-    { name: "World Chat", action: () => { navigator.clipboard?.writeText(shareText); alert("Copied! Paste it in World Chat."); }, icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg> },
-  ];
+function ShareButton({ time }) {
+  const [blurbIndex] = useState(() => Math.floor(Math.random() * SHARE_BLURBS.length));
+  const gameUrl = "https://flashback-lemon.vercel.app";
+  const timeDisplay = formatTime(time).display;
+
+  const handleShare = async () => {
+    const text = SHARE_BLURBS[blurbIndex](timeDisplay, gameUrl);
+
+    // Try to generate a score card image
+    try {
+      const canvas = document.createElement("canvas");
+      canvas.width = 600; canvas.height = 300;
+      const ctx = canvas.getContext("2d");
+      ctx.fillStyle = "#2D1B4E";
+      ctx.fillRect(0, 0, 600, 300);
+      ctx.fillStyle = "#F2C94C";
+      ctx.roundRect(40, 40, 520, 220, 20);
+      ctx.fill();
+      ctx.fillStyle = "#2D1B4E";
+      ctx.font = "bold 100px monospace";
+      ctx.textAlign = "center";
+      ctx.fillText(timeDisplay, 300, 170);
+      ctx.font = "bold 28px sans-serif";
+      ctx.fillText("FlashBack", 300, 230);
+
+      canvas.toBlob(async (blob) => {
+        const file = new File([blob], "flashback-score.png", { type: "image/png" });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({ text, files: [file] });
+        } else if (navigator.share) {
+          await navigator.share({ text });
+        } else {
+          await navigator.clipboard.writeText(text);
+          alert("Copied to clipboard!");
+        }
+      }, "image/png");
+    } catch {
+      // Fallback — no image
+      if (navigator.share) { navigator.share({ text }); }
+      else { navigator.clipboard.writeText(text); alert("Copied to clipboard!"); }
+    }
+  };
+
   return (
-    <div style={{ display: "flex", justifyContent: "center", gap: "0.75rem" }}>
-      {platforms.map(p => (
-        <button key={p.name} onClick={p.action} style={{ width: "44px", height: "44px", borderRadius: "12px", background: "rgba(242,232,255,0.08)", border: "none", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "all 0.2s ease" }}
-          onMouseEnter={e => { e.currentTarget.style.background = "rgba(242,232,255,0.14)"; }}
-          onMouseLeave={e => { e.currentTarget.style.background = "rgba(242,232,255,0.08)"; }}
-          title={p.name}>{p.icon}</button>
-      ))}
-    </div>
+    <button onClick={handleShare} style={{
+      width: "100%", maxWidth: "340px", background: "#F2C94C", color: "#2D1B4E",
+      border: "none", borderRadius: "14px", padding: "1rem", fontSize: "1rem",
+      fontWeight: 800, cursor: "pointer", fontFamily: "'Space Grotesk', sans-serif",
+      letterSpacing: "0.03em", transition: "all 0.2s ease",
+    }}
+      onMouseEnter={e => { e.currentTarget.style.opacity = "0.85"; }}
+      onMouseLeave={e => { e.currentTarget.style.opacity = "1"; }}
+    >Share your Score with Others!</button>
   );
 }
 
@@ -616,11 +645,13 @@ function CompleteScreen({ time, failedAttempts, puzzle, onViewChain, firstVisit 
   const [show, setShow] = useState(false);
   const [showCelebWord, setShowCelebWord] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
-  const [todayLB, setTodayLB] = useState([]);
-  const [stats, setStats] = useState(null);
   const stars = getStars(failedAttempts);
   const { display } = formatTime(time);
   const [celebWord] = useState(() => getCelebWord(stars));
+  const localStats = getStats();
+  const played = localStats.played;
+  const perfects = localStats.perfects;
+  const bestTime = localStats.best ? formatTime(localStats.best).display : display;
 
   useEffect(() => {
     setTimeout(() => setShow(true), 300);
@@ -632,14 +663,7 @@ function CompleteScreen({ time, failedAttempts, puzzle, onViewChain, firstVisit 
     } else {
       setShowCelebWord(true);
     }
-    fetch("/api/leaderboard?type=today&limit=5").then(r => r.json()).then(d => setTodayLB(d.leaderboard || [])).catch(() => {});
-    const pid = getPlayerId();
-    fetch(`/api/player?id=${pid}`).then(r => r.json()).then(setStats).catch(() => {});
   }, []);
-
-  const playerRank = stats?.rankToday || 0;
-  const played = stats?.chainsCompleted || 1;
-  const bestTime = stats?.bestTime ? formatTime(stats.bestTime).display : display;
 
   return (
     <>
@@ -647,22 +671,10 @@ function CompleteScreen({ time, failedAttempts, puzzle, onViewChain, firstVisit 
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "100dvh", padding: "1.5rem", textAlign: "center", position: "relative",
         opacity: show ? 1 : 0, transform: show ? "translateY(0)" : "translateY(30px)", transition: "all 0.8s cubic-bezier(0.16, 1, 0.3, 1)" }}>
 
-        <button onClick={onViewChain} style={{ position: "absolute", top: "1.5rem", left: "1.5rem", background: "none", border: "none", cursor: "pointer", padding: "0.5rem", color: "rgba(242,232,255,0.2)", display: "flex", alignItems: "center" }}>
-          <svg width="20" height="18" viewBox="0 0 20 18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-            <line x1="0" y1="1" x2="20" y2="1"/>
-            <line x1="0" y1="4" x2="20" y2="4"/>
-            <line x1="0" y1="7" x2="20" y2="7"/>
-            <line x1="0" y1="10" x2="20" y2="10"/>
-            <line x1="0" y1="13" x2="20" y2="13"/>
-            <line x1="0" y1="16" x2="20" y2="16"/>
-            <line x1="0" y1="19" x2="20" y2="19"/>
-          </svg>
-        </button>
-
-        {/* Only earned stars — no empty slots */}
+        {/* Stars */}
         <StarDisplay stars={stars} size={44} celebrate={firstVisit} />
 
-        {/* Random celebratory word */}
+        {/* Celebratory word */}
         <div style={{
           fontSize: "clamp(1.6rem, 5.5vw, 2.2rem)", fontWeight: 800, fontFamily: "'Space Grotesk', sans-serif",
           color: "#F2E8FF", marginTop: "1rem", marginBottom: "1.5rem",
@@ -670,58 +682,49 @@ function CompleteScreen({ time, failedAttempts, puzzle, onViewChain, firstVisit 
           transition: "all 0.6s cubic-bezier(0.16, 1, 0.3, 1)",
         }}>{celebWord}</div>
 
-        <div style={{ background: "#F2C94C", borderRadius: "16px", padding: "1.25rem 2rem", marginBottom: "1.5rem", width: "100%", maxWidth: "340px" }}>
+        {/* Time + stats card */}
+        <div style={{ background: "#F2C94C", borderRadius: "16px", padding: "1.25rem 2rem", marginBottom: "1rem", width: "100%", maxWidth: "340px" }}>
           <div style={{ fontSize: "clamp(2.4rem, 8vw, 3.2rem)", fontWeight: 800, color: "#2D1B4E", fontFamily: "'JetBrains Mono', monospace", lineHeight: 1 }}>{display}</div>
           <div style={{ display: "flex", justifyContent: "center", gap: "1.5rem", marginTop: "0.75rem" }}>
-            <div style={{ textAlign: "center" }}>
-              <div style={{ fontSize: "1rem", fontWeight: 700, color: "#2D1B4E", fontFamily: "'JetBrains Mono', monospace" }}>{failedAttempts}</div>
-              <div style={{ fontSize: "0.6rem", color: "rgba(45,27,78,0.5)", fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: "0.1em" }}>Attempts</div>
-            </div>
-            <div style={{ width: "1px", background: "rgba(45,27,78,0.15)" }} />
-            <div style={{ textAlign: "center" }}>
-              <div style={{ fontSize: "1rem", fontWeight: 700, color: "#2D1B4E", fontFamily: "'JetBrains Mono', monospace" }}>{played}</div>
-              <div style={{ fontSize: "0.6rem", color: "rgba(45,27,78,0.4)", fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: "0.1em" }}>Played</div>
-            </div>
-            <div style={{ width: "1px", background: "rgba(45,27,78,0.15)" }} />
-            <div style={{ textAlign: "center" }}>
-              <div style={{ fontSize: "1rem", fontWeight: 700, color: "#2D1B4E", fontFamily: "'JetBrains Mono', monospace" }}>{bestTime}</div>
-              <div style={{ fontSize: "0.6rem", color: "rgba(45,27,78,0.4)", fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: "0.1em" }}>Best</div>
-            </div>
-          </div>
-        </div>
-
-        <div style={{ width: "100%", maxWidth: "340px", marginBottom: "1.5rem" }}>
-          <div style={{ fontSize: "0.6rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(242,232,255,0.28)", fontFamily: "'JetBrains Mono', monospace", marginBottom: "0.6rem", textAlign: "left" }}>Today&apos;s Top 5</div>
-          <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-            {todayLB.length === 0 && (
-              <div style={{ padding: "0.75rem", color: "rgba(242,232,255,0.25)", fontSize: "0.75rem", fontFamily: "'JetBrains Mono', monospace" }}>No other scores yet. You are the first!</div>
-            )}
-            {todayLB.slice(0, 5).map((entry, i) => (
-              <div key={i} style={{ display: "flex", alignItems: "center", padding: "0.5rem 0.75rem", background: i === 0 ? "rgba(242,232,255,0.07)" : "transparent", borderRadius: "8px" }}>
-                <div style={{ width: "24px", fontSize: "0.7rem", fontWeight: 700, color: i === 0 ? "#F2E8FF" : "rgba(242,232,255,0.25)", fontFamily: "'JetBrains Mono', monospace" }}>{entry.rank}</div>
-                <div style={{ flex: 1, fontSize: "0.75rem", color: i === 0 ? "#F2E8FF" : "rgba(242,232,255,0.4)", fontFamily: "'DM Sans', sans-serif", textAlign: "left" }}>{entry.name}</div>
-                <div style={{ fontSize: "0.7rem", color: i === 0 ? "#F2E8FF" : "rgba(242,232,255,0.25)", fontFamily: "'JetBrains Mono', monospace", fontWeight: 600 }}>{formatTime(entry.time).display}</div>
+            {[
+              [played, "Played"],
+              [perfects, "Perfect Scores"],
+              [bestTime, "Best"],
+            ].map(([val, label]) => (
+              <div key={label} style={{ textAlign: "center" }}>
+                <div style={{ fontSize: "1rem", fontWeight: 700, color: "#2D1B4E", fontFamily: "'JetBrains Mono', monospace" }}>{val}</div>
+                <div style={{ fontSize: "0.55rem", color: "rgba(45,27,78,0.5)", fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: "0.08em", marginTop: "2px" }}>{label}</div>
               </div>
             ))}
-            {playerRank > 5 && (
-              <>
-                <div style={{ height: "1px", background: "rgba(242,232,255,0.08)", margin: "0.25rem 0" }} />
-                <div style={{ display: "flex", alignItems: "center", padding: "0.5rem 0.75rem", background: "#F2C94C", borderRadius: "8px" }}>
-                  <div style={{ width: "24px", fontSize: "0.7rem", fontWeight: 700, color: "#2D1B4E", fontFamily: "'JetBrains Mono', monospace" }}>{playerRank}</div>
-                  <div style={{ flex: 1, fontSize: "0.75rem", color: "#2D1B4E", fontFamily: "'DM Sans', sans-serif", fontWeight: 600, textAlign: "left" }}>You</div>
-                  <div style={{ fontSize: "0.7rem", color: "#2D1B4E", fontFamily: "'JetBrains Mono', monospace", fontWeight: 600 }}>{display}</div>
-                </div>
-              </>
-            )}
           </div>
         </div>
 
-        {/* Rotating CTA above share buttons */}
-        <div style={{ fontSize: "1rem", fontWeight: 700, color: "#F2E8FF", fontFamily: "'Space Grotesk', sans-serif", marginBottom: "0.6rem", letterSpacing: "0.03em" }}>
-          {SHARE_CTAS[Math.floor(Math.random() * SHARE_CTAS.length)]}
+        {/* Check your timeline button */}
+        <button onClick={onViewChain} style={{
+          width: "100%", maxWidth: "340px", background: "rgba(242,232,255,0.08)", color: "#F2E8FF",
+          border: "1px solid rgba(242,232,255,0.2)", borderRadius: "14px", padding: "0.85rem",
+          fontSize: "0.95rem", fontWeight: 700, cursor: "pointer", marginBottom: "1.5rem",
+          fontFamily: "'Space Grotesk', sans-serif", letterSpacing: "0.03em", transition: "all 0.2s ease",
+        }}
+          onMouseEnter={e => { e.currentTarget.style.background = "rgba(242,232,255,0.13)"; }}
+          onMouseLeave={e => { e.currentTarget.style.background = "rgba(242,232,255,0.08)"; }}
+        >&#8801; Check your Winning Timeline!</button>
+
+        {/* Your top 5 personal scores */}
+        <div style={{ width: "100%", maxWidth: "340px", marginBottom: "1.5rem" }}>
+          <div style={{ fontSize: "0.6rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(242,232,255,0.28)", fontFamily: "'JetBrains Mono', monospace", marginBottom: "0.6rem", textAlign: "left" }}>Your Top 5</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+            {[1,2,3,4,5].map(i => (
+              <div key={i} style={{ display: "flex", alignItems: "center", padding: "0.5rem 0.75rem", background: i === 1 ? "rgba(242,232,255,0.07)" : "transparent", borderRadius: "8px" }}>
+                <div style={{ width: "24px", fontSize: "0.7rem", fontWeight: 700, color: i === 1 ? "#F2E8FF" : "rgba(242,232,255,0.25)", fontFamily: "'JetBrains Mono', monospace" }}>{i}</div>
+                <div style={{ flex: 1, fontSize: "0.75rem", color: "rgba(242,232,255,0.25)", fontFamily: "'DM Sans', sans-serif", textAlign: "left" }}>—</div>
+              </div>
+            ))}
+          </div>
         </div>
-        <ShareIcons stars={stars} time={time} date={puzzle.date} />
-        <div style={{ fontSize: "0.65rem", color: "rgba(242,232,255,0.2)", fontFamily: "'JetBrains Mono', monospace", marginTop: "1.25rem" }}>Next chain drops at midnight</div>
+
+        {/* Share button */}
+        <ShareButton time={time} />
       </div>
     </>
   );
