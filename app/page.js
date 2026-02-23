@@ -661,9 +661,11 @@ function CompleteScreen({ time, failedAttempts, puzzle, onViewChain, firstVisit 
   const stars = getStars(failedAttempts);
   const { display } = formatTime(time);
   const [celebWord] = useState(() => getCelebWord(stars));
-  // Save first, then read — so today's score shows up immediately
-  if (firstVisit) { saveStats(time, stars); }
-  const localStats = getStats();
+  const [localStats] = useState(() => {
+    // Save once on mount, then read — so today's score shows immediately
+    if (firstVisit) saveStats(time, stars);
+    return getStats();
+  });
   const played = localStats.played;
   const perfects = localStats.perfects;
   const bestTime = localStats.best ? formatTime(localStats.best).display : display;
