@@ -656,6 +656,8 @@ function CompleteScreen({ time, failedAttempts, puzzle, onViewChain, firstVisit 
   const stars = getStars(failedAttempts);
   const { display } = formatTime(time);
   const [celebWord] = useState(() => getCelebWord(stars));
+  // Save first, then read — so today's score shows up immediately
+  if (firstVisit) { saveStats(time, stars); }
   const localStats = getStats();
   const played = localStats.played;
   const perfects = localStats.perfects;
@@ -667,7 +669,6 @@ function CompleteScreen({ time, failedAttempts, puzzle, onViewChain, firstVisit 
       setTimeout(() => { setShowCelebWord(true); setShowConfetti(true); }, 500);
       setTimeout(() => setShowConfetti(false), 3500);
       if (onMount) onMount();
-      saveStats(time, stars);
     } else {
       setShowCelebWord(true);
     }
