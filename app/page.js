@@ -48,6 +48,11 @@ function saveStats(timeMs, stars) {
     localStorage.setItem("flashback_played",   String(prev.played + 1));
     localStorage.setItem("flashback_perfects", String(prev.perfects + (stars === 3 ? 1 : 0)));
     if (timeMs && stars > 0 && (!prev.best || timeMs < prev.best)) localStorage.setItem("flashback_best", String(timeMs));
+    if (timeMs && stars > 0) {
+      const existing = JSON.parse(localStorage.getItem("flashback_times") || "[]");
+      const updated = [...existing, timeMs].sort((a, b) => a - b).slice(0, 5);
+      localStorage.setItem("flashback_times", JSON.stringify(updated));
+    }
   } catch {}
 }
 
