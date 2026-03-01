@@ -52,6 +52,9 @@ function saveStats(timeMs, stars) {
       const existing = JSON.parse(localStorage.getItem("flashback_times") || "[]");
       const updated = [...existing, timeMs].sort((a, b) => a - b).slice(0, 5);
       localStorage.setItem("flashback_times", JSON.stringify(updated));
+      const recent = JSON.parse(localStorage.getItem("flashback_recent") || "[]");
+      const updatedRecent = [timeMs, ...recent].slice(0, 5);
+      localStorage.setItem("flashback_recent", JSON.stringify(updatedRecent));
     }
   } catch {}
 }
@@ -640,7 +643,7 @@ function ShareButton({ time }) {
 
   return (
     <button onClick={handleShare} style={{
-      width: "100%", maxWidth: "340px", background: "#F2C94C", color: "#2D1B4E",
+      width: "100%", maxWidth: "340px", background: "#FF6B6B", color: "#ffffff",
       border: "none", borderRadius: "14px", padding: "1rem", fontSize: "1rem",
       fontWeight: 800, cursor: "pointer", fontFamily: "'Space Grotesk', sans-serif",
       letterSpacing: "0.03em", transition: "all 0.2s ease",
@@ -726,22 +729,68 @@ function CompleteScreen({ time, failedAttempts, puzzle, onViewChain, firstVisit 
           onMouseLeave={e => { e.currentTarget.style.background = "rgba(242,232,255,0.08)"; }}
         >&#8801; Check your Winning Timeline!</button>
 
-        {/* Your top 5 personal scores */}
+        {/* Last 5 plays (oldest→newest, bottom = most recent) + best */}
         <div style={{ width: "100%", maxWidth: "340px", marginBottom: "1.5rem" }}>
-          <div style={{ fontSize: "0.6rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(242,232,255,0.28)", fontFamily: "'JetBrains Mono', monospace", marginBottom: "0.6rem", textAlign: "left" }}>Your Top 5</div>
-          <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-            {(() => {
-              const times = JSON.parse(typeof localStorage !== "undefined" ? localStorage.getItem("flashback_times") || "[]" : "[]");
-              return [0,1,2,3,4].map(i => (
-                <div key={i} style={{ display: "flex", alignItems: "center", padding: "0.5rem 0.75rem", background: i === 0 ? "rgba(242,232,255,0.07)" : "transparent", borderRadius: "8px" }}>
-                  <div style={{ width: "24px", fontSize: "0.7rem", fontWeight: 700, color: i === 0 ? "#F2E8FF" : "rgba(242,232,255,0.25)", fontFamily: "'JetBrains Mono', monospace" }}>{i + 1}</div>
-                  <div style={{ flex: 1, fontSize: "0.75rem", color: i === 0 ? "#F2E8FF" : "rgba(242,232,255,0.35)", fontFamily: "'JetBrains Mono', monospace", textAlign: "left" }}>
-                    {times[i] ? formatTime(times[i]).display : "—"}
-                  </div>
+          {(() => {
+            const recent = JSON.parse(typeof localStorage !== "undefined" ? localStorage.getItem("flashback_recent") || "[]" : "[]");
+            const bestMs  = parseInt(typeof localStorage !== "undefined" ? localStorage.getItem("flashback_best") || "0" : "0", 10) || null;
+
+            const allTimes = [...recent, bestMs].filter(Boolean);
+            const slowest = allTimes.length ? Math.max(...allTimes) : 1;
+            const fastest = allTimes.length ? Math.min(...allTimes) : 1;
+            const range = slowest - fastest || 1;
+            const barWidth = (ms) => 30 + ((slowest - ms) / range) * 70;
+
+            return (
+              <>
+                <div style={{ fontSize: "0.6rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(242,232,255,0.28)", fontFamily: "'JetBrains Mono', monospace", marginBottom: "0.75rem", textAlign: "left" }}>Your Last 5</div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px", marginBottom: "0.75rem" }}>
+                  {[4,3,2,1,0].map((dataIndex) => {
+                    const ms = recent[dataIndex];
+                    const isLatest = dataIndex === 0;
+                    return (
+                      <div key={dataIndex} style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                        <div style={{ width: "16px", flexShrink: 0, textAlign: "right", fontSize: "0.6rem", fontWeight: 700, fontFamily: "'JetBrains Mono', monospace", color: ms ? (isLatest ? "rgba(242,232,255,0.6)" : "rgba(242,232,255,0.25)") : "rgba(242,232,255,0.1)" }}>
+                          {ms ? (dataIndex + 1) : ""}
+                        </div>
+                        <div style={{ flex: 1, height: "32px", background: "rgba(242,232,255,0.05)", borderRadius: "8px", overflow: "hidden", position: "relative" }}>
+                          {ms ? (
+                            <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: `${barWidth(ms)}%`, background: isLatest ? "rgba(242,232,255,0.25)" : "rgba(242,232,255,0.12)", borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "flex-end", paddingRight: "10px" }}>
+                              <span style={{ fontSize: "0.7rem", fontWeight: 700, fontFamily: "'JetBrains Mono', monospace", color: "#F2E8FF", whiteSpace: "nowrap" }}>{formatTime(ms).display}</span>
+                            </div>
+                          ) : (
+                            <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", paddingLeft: "12px" }}>
+                              <span style={{ fontSize: "0.65rem", color: "rgba(242,232,255,0.15)", fontFamily: "'JetBrains Mono', monospace" }}>—</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
-              ));
-            })()}
-          </div>
+
+                {/* Divider */}
+                <div style={{ height: "1px", background: "rgba(242,232,255,0.08)", marginBottom: "0.75rem" }} />
+
+                {/* Best — gold */}
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <div style={{ width: "16px", flexShrink: 0, textAlign: "right", fontSize: "0.6rem", fontWeight: 700, fontFamily: "'JetBrains Mono', monospace", color: "rgba(242,232,255,0.3)" }}>★</div>
+                  <div style={{ flex: 1, height: "32px", background: "rgba(242,232,255,0.05)", borderRadius: "8px", overflow: "hidden", position: "relative" }}>
+                    {bestMs ? (
+                      <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: `${barWidth(bestMs)}%`, background: "#F2C94C", borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "flex-end", paddingRight: "10px" }}>
+                        <span style={{ fontSize: "0.7rem", fontWeight: 700, fontFamily: "'JetBrains Mono', monospace", color: "#2D1B4E", whiteSpace: "nowrap" }}>{formatTime(bestMs).display}</span>
+                      </div>
+                    ) : (
+                      <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", paddingLeft: "12px" }}>
+                        <span style={{ fontSize: "0.65rem", color: "rgba(242,232,255,0.15)", fontFamily: "'JetBrains Mono', monospace" }}>—</span>
+                      </div>
+                    )}
+                  </div>
+                  <div style={{ fontSize: "0.55rem", fontWeight: 700, fontFamily: "'JetBrains Mono', monospace", color: "rgba(242,232,255,0.3)", letterSpacing: "0.1em", textTransform: "uppercase", flexShrink: 0 }}>Best</div>
+                </div>
+              </>
+            );
+          })()}
         </div>
 
         {/* Share button */}
