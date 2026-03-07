@@ -727,7 +727,7 @@ function CompleteScreen({ time, failedAttempts, puzzle, onViewChain, firstVisit 
         }}
           onMouseEnter={e => { e.currentTarget.style.background = "rgba(242,232,255,0.13)"; }}
           onMouseLeave={e => { e.currentTarget.style.background = "rgba(242,232,255,0.08)"; }}
-        >&#8801; Check your Winning Timeline!</button>
+        >Check your Winning Timeline!</button>
 
         {/* Last 5 plays (oldest→newest, bottom = most recent) + best */}
         <div style={{ width: "100%", maxWidth: "340px", marginBottom: "1.5rem" }}>
