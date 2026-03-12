@@ -687,24 +687,24 @@ function CompleteScreen({ time, failedAttempts, puzzle, onViewChain, firstVisit 
   return (
     <>
       <Confetti active={showConfetti} />
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-start", minHeight: "100dvh", padding: "2rem 1.5rem 3rem", textAlign: "center", position: "relative", overflowY: "auto",
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "space-between", height: "100dvh", padding: "clamp(0.75rem, 2.5vh, 1.5rem) 1.5rem clamp(0.75rem, 2.5vh, 1.5rem)", textAlign: "center", position: "relative", overflow: "hidden",
         opacity: show ? 1 : 0, transform: show ? "translateY(0)" : "translateY(30px)", transition: "all 0.8s cubic-bezier(0.16, 1, 0.3, 1)" }}>
 
         {/* Stars */}
-        <StarDisplay stars={stars} size={44} celebrate={firstVisit} />
+        <StarDisplay stars={stars} size={36} celebrate={firstVisit} />
 
         {/* Celebratory word */}
         <div style={{
-          fontSize: "clamp(1.6rem, 5.5vw, 2.2rem)", fontWeight: 800, fontFamily: "'Space Grotesk', sans-serif",
-          color: "#F2E8FF", marginTop: "1rem", marginBottom: "1.5rem",
+          fontSize: "clamp(1.3rem, 5vw, 1.8rem)", fontWeight: 800, fontFamily: "'Space Grotesk', sans-serif",
+          color: "#F2E8FF", marginTop: "0.4rem", marginBottom: "0",
           opacity: showCelebWord ? 1 : 0, transform: showCelebWord ? "scale(1)" : "scale(0.8)",
           transition: "all 0.6s cubic-bezier(0.16, 1, 0.3, 1)",
         }}>{celebWord}</div>
 
         {/* Time + stats card */}
-        <div style={{ background: "#F2C94C", borderRadius: "16px", padding: "1.25rem 2rem", marginBottom: "1rem", width: "100%", maxWidth: "340px" }}>
-          <div style={{ fontSize: "clamp(2.4rem, 8vw, 3.2rem)", fontWeight: 800, color: "#2D1B4E", fontFamily: "'JetBrains Mono', monospace", lineHeight: 1 }}>{display}</div>
-          <div style={{ display: "flex", justifyContent: "center", gap: "1.5rem", marginTop: "0.75rem" }}>
+        <div style={{ background: "#F2C94C", borderRadius: "16px", padding: "0.75rem 1.5rem", marginBottom: "0", width: "100%", maxWidth: "340px" }}>
+          <div style={{ fontSize: "clamp(2rem, 7vw, 2.6rem)", fontWeight: 800, color: "#2D1B4E", fontFamily: "'JetBrains Mono', monospace", lineHeight: 1 }}>{display}</div>
+          <div style={{ display: "flex", justifyContent: "center", gap: "1.5rem", marginTop: "0.4rem" }}>
             {[
               [played, "Played"],
               [perfects, "Perfect Scores"],
@@ -721,8 +721,8 @@ function CompleteScreen({ time, failedAttempts, puzzle, onViewChain, firstVisit 
         {/* Check your timeline button */}
         <button onClick={onViewChain} style={{
           width: "100%", maxWidth: "340px", background: "rgba(242,232,255,0.08)", color: "#F2E8FF",
-          border: "1px solid rgba(242,232,255,0.2)", borderRadius: "14px", padding: "0.85rem",
-          fontSize: "0.95rem", fontWeight: 700, cursor: "pointer", marginBottom: "1.5rem",
+          border: "1px solid rgba(242,232,255,0.2)", borderRadius: "14px", padding: "0.7rem",
+          fontSize: "0.9rem", fontWeight: 700, cursor: "pointer", marginBottom: "0",
           fontFamily: "'Space Grotesk', sans-serif", letterSpacing: "0.03em", transition: "all 0.2s ease",
         }}
           onMouseEnter={e => { e.currentTarget.style.background = "rgba(242,232,255,0.13)"; }}
@@ -730,7 +730,7 @@ function CompleteScreen({ time, failedAttempts, puzzle, onViewChain, firstVisit 
         >&#8801; Check your Winning Timeline!</button>
 
         {/* Last 5 plays (oldest→newest, bottom = most recent) + best */}
-        <div style={{ width: "100%", maxWidth: "340px", marginBottom: "1.5rem" }}>
+        <div style={{ width: "100%", maxWidth: "340px", marginBottom: "0" }}>
           {(() => {
             const recent = JSON.parse(typeof localStorage !== "undefined" ? localStorage.getItem("flashback_recent") || "[]" : "[]");
             const bestMs  = parseInt(typeof localStorage !== "undefined" ? localStorage.getItem("flashback_best") || "0" : "0", 10) || null;
@@ -743,8 +743,8 @@ function CompleteScreen({ time, failedAttempts, puzzle, onViewChain, firstVisit 
 
             return (
               <>
-                <div style={{ fontSize: "0.6rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(242,232,255,0.28)", fontFamily: "'JetBrains Mono', monospace", marginBottom: "0.75rem", textAlign: "left" }}>Your Last 5</div>
-                <div style={{ display: "flex", flexDirection: "column", gap: "6px", marginBottom: "0.75rem" }}>
+                <div style={{ fontSize: "0.6rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(242,232,255,0.28)", fontFamily: "'JetBrains Mono', monospace", marginBottom: "0.4rem", textAlign: "left" }}>Your Last 5</div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "4px", marginBottom: "0.4rem" }}>
                   {[4,3,2,1,0].map((dataIndex) => {
                     const ms = recent[dataIndex];
                     const isLatest = dataIndex === 0;
@@ -753,7 +753,7 @@ function CompleteScreen({ time, failedAttempts, puzzle, onViewChain, firstVisit 
                         <div style={{ width: "16px", flexShrink: 0, textAlign: "right", fontSize: "0.6rem", fontWeight: 700, fontFamily: "'JetBrains Mono', monospace", color: ms ? (isLatest ? "rgba(242,232,255,0.6)" : "rgba(242,232,255,0.25)") : "rgba(242,232,255,0.1)" }}>
                           {ms ? (dataIndex + 1) : ""}
                         </div>
-                        <div style={{ flex: 1, height: "32px", background: "rgba(242,232,255,0.05)", borderRadius: "8px", overflow: "hidden", position: "relative" }}>
+                        <div style={{ flex: 1, height: "24px", background: "rgba(242,232,255,0.05)", borderRadius: "8px", overflow: "hidden", position: "relative" }}>
                           {ms ? (
                             <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: `${barWidth(ms)}%`, background: isLatest ? "rgba(242,232,255,0.25)" : "rgba(242,232,255,0.12)", borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "flex-end", paddingRight: "10px" }}>
                               <span style={{ fontSize: "0.7rem", fontWeight: 700, fontFamily: "'JetBrains Mono', monospace", color: "#F2E8FF", whiteSpace: "nowrap" }}>{formatTime(ms).display}</span>
@@ -770,12 +770,12 @@ function CompleteScreen({ time, failedAttempts, puzzle, onViewChain, firstVisit 
                 </div>
 
                 {/* Divider */}
-                <div style={{ height: "1px", background: "rgba(242,232,255,0.08)", marginBottom: "0.75rem" }} />
+                <div style={{ height: "1px", background: "rgba(242,232,255,0.08)", marginBottom: "0.4rem" }} />
 
                 {/* Best — gold */}
                 <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                   <div style={{ width: "16px", flexShrink: 0, textAlign: "right", fontSize: "0.6rem", fontWeight: 700, fontFamily: "'JetBrains Mono', monospace", color: "rgba(242,232,255,0.3)" }}>★</div>
-                  <div style={{ flex: 1, height: "32px", background: "rgba(242,232,255,0.05)", borderRadius: "8px", overflow: "hidden", position: "relative" }}>
+                  <div style={{ flex: 1, height: "24px", background: "rgba(242,232,255,0.05)", borderRadius: "8px", overflow: "hidden", position: "relative" }}>
                     {bestMs ? (
                       <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: `${barWidth(bestMs)}%`, background: "#F2C94C", borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "flex-end", paddingRight: "10px" }}>
                         <span style={{ fontSize: "0.7rem", fontWeight: 700, fontFamily: "'JetBrains Mono', monospace", color: "#2D1B4E", whiteSpace: "nowrap" }}>{formatTime(bestMs).display}</span>
@@ -917,8 +917,8 @@ export default function FlashBackApp() {
 
 const globalStyles = `
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-text-size-adjust: 100%; }
-  body { background: #2D1B4E; margin: 0; }
-  html { }
+  body { background: #2D1B4E; margin: 0; overflow: hidden; }
+  html { overflow: hidden; }
   ::-webkit-scrollbar { display: none; }
   @keyframes shake { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-6px); } 40% { transform: translateX(6px); } 60% { transform: translateX(-4px); } 80% { transform: translateX(4px); } }
   @keyframes celebrate { 0% { transform: scale(1); } 25% { transform: scale(1.03) rotate(-0.5deg); } 50% { transform: scale(1.05) rotate(0.5deg); } 75% { transform: scale(1.03) rotate(-0.3deg); } 100% { transform: scale(1); } }
