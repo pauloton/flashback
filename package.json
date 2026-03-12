@@ -12,5 +12,6 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "@vercel/postgres": "^0.10.0"
+    "@worldcoin/minikit-js": "^1.0.0"
   }
 }
