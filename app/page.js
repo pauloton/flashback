@@ -687,7 +687,7 @@ function CompleteScreen({ time, failedAttempts, puzzle, onViewChain, firstVisit 
   return (
     <>
       <Confetti active={showConfetti} />
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "100dvh", padding: "1.5rem", textAlign: "center", position: "relative",
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-start", minHeight: "100dvh", padding: "2rem 1.5rem 3rem", textAlign: "center", position: "relative", overflowY: "auto",
         opacity: show ? 1 : 0, transform: show ? "translateY(0)" : "translateY(30px)", transition: "all 0.8s cubic-bezier(0.16, 1, 0.3, 1)" }}>
 
         {/* Stars */}
@@ -727,7 +727,7 @@ function CompleteScreen({ time, failedAttempts, puzzle, onViewChain, firstVisit 
         }}
           onMouseEnter={e => { e.currentTarget.style.background = "rgba(242,232,255,0.13)"; }}
           onMouseLeave={e => { e.currentTarget.style.background = "rgba(242,232,255,0.08)"; }}
-        >Check your Winning Timeline!</button>
+        >&#8801; Check your Winning Timeline!</button>
 
         {/* Last 5 plays (oldest→newest, bottom = most recent) + best */}
         <div style={{ width: "100%", maxWidth: "340px", marginBottom: "1.5rem" }}>
@@ -917,8 +917,8 @@ export default function FlashBackApp() {
 
 const globalStyles = `
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-text-size-adjust: 100%; }
-  body { background: #2D1B4E; margin: 0; overflow: hidden; }
-  html { overflow: hidden; }
+  body { background: #2D1B4E; margin: 0; }
+  html { }
   ::-webkit-scrollbar { display: none; }
   @keyframes shake { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-6px); } 40% { transform: translateX(6px); } 60% { transform: translateX(-4px); } 80% { transform: translateX(4px); } }
   @keyframes celebrate { 0% { transform: scale(1); } 25% { transform: scale(1.03) rotate(-0.5deg); } 50% { transform: scale(1.05) rotate(0.5deg); } 75% { transform: scale(1.03) rotate(-0.3deg); } 100% { transform: scale(1); } }
