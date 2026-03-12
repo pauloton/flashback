@@ -1,4 +1,5 @@
-export const metadata = {
+import { MiniKitProvider } from './minikit-provider'
+  export const metadata = {
   title: "FlashBack — History is out of order. Fix it!",
   description: "Sort 7 historical events. Race the clock. Challenge the world.",
   viewport: "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no",
@@ -17,7 +18,7 @@ export default function RootLayout({ children }) {
      <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />       
       </head>
-      <body style={{ margin: 0, background: "#FFFFFF" }}>{children}</body>
-    </html>
+<body style={{ margin: 0, background: "#FFFFFF" }}><MiniKitProvider>{children}</MiniKitProvider></body>
+  </html>
   );
 }
